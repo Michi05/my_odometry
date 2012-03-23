@@ -1,0 +1,14 @@
+
+<!-- odoCVsubscriber is a module meant to get images from the image interface while using openCV for showing what is happening. -->
+
+<launch>
+  <arg name="absolute_namespace" default="/" /> <!-- launchfile absolute namespace -->
+
+<!-- 
+    <include file="$(find image_adaptor)/launch/launchWithParams.launch">
+      <arg name="absolute_namespace" value="$(arg absolute_namespace)/$(arg robot_ns)/" /> --> <!-- absolute namespace inside of the group
+    </include> -->
+    <node name="odoCVsubscriber" pkg="my_odometry" type="odoCVsubscriber.py" />
+</launch>
+
+
