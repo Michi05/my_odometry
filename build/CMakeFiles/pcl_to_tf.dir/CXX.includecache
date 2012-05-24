@@ -35,6 +35,8 @@ pcl_ros/point_cloud.h
 -
 pcl/filters/filter.h
 -
+boost/thread.hpp
+-
 
 /home/super/ros_workspace/my_odometry/nodes/pcl_to_tf.cpp
 ros/ros.h
