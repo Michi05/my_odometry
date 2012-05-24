@@ -5,7 +5,7 @@
 #include <sstream>
 
 // MICHI: May20
-#include <pcl_to_tf.hpp>
+#include <pcl_odometry.cpp>
 
 
 ////////////////////////////////////////////////////
@@ -43,16 +43,11 @@ double ARG_maxDistance=1.2;
 
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "pcl_to_tf");
-	if (argc>2) {
-		ARG_epsilon = atof(argv[1]);
-		ARG_maxIterations = atoi(argv[2]);
-		ARG_maxDistance = atof(argv[3]);
-	} 
 	
 	ros::NodeHandle nHandle;
 	ros::NodeHandle *nHandlePtr = &nHandle;
 	
-	nodeComm odoComm(nHandlePtr);
+	pcl_odometry::odometryComm odoComm(nHandlePtr);
 
 	odoComm.startCommunications();
 	
