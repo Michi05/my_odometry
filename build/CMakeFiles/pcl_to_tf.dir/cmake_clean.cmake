@@ -1,5 +1,5 @@
 FILE(REMOVE_RECURSE
-  "CMakeFiles/pcl_to_tf.dir/nodes/pcl_to_tf.o"
+  "CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o"
   "../bin/pcl_to_tf.pdb"
   "../bin/pcl_to_tf"
 )

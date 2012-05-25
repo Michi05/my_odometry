@@ -186,7 +186,7 @@ TOOLCHAINCONFIG:FILEPATH=TOOLCHAINCONFIG-NOTFOUND
 USERCONFIG:FILEPATH=USERCONFIG-NOTFOUND
 
 //Path to a file.
-_file_name:FILEPATH=/home/super/ros_workspace/my_odometry/nodes/pcl_to_tf.cpp
+_file_name:FILEPATH=/home/super/ros_workspace/my_odometry/src/pcl_to_tf.cpp
 
 //Value Computed by CMake
 my_odometry_BINARY_DIR:STATIC=/home/super/ros_workspace/my_odometry/build
