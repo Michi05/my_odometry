@@ -304,6 +304,21 @@ tests/fast:
 .PHONY : tests/fast
 
 # target to build an object file
+src/pcl_odometry.o:
+	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
+.PHONY : src/pcl_odometry.o
+
+# target to preprocess a source file
+src/pcl_odometry.i:
+	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.i
+.PHONY : src/pcl_odometry.i
+
+# target to generate assembly for a file
+src/pcl_odometry.s:
+	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.s
+.PHONY : src/pcl_odometry.s
+
+# target to build an object file
 src/pcl_to_tf.o:
 	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
 .PHONY : src/pcl_to_tf.o
@@ -342,6 +357,9 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... src/pcl_odometry.o"
+	@echo "... src/pcl_odometry.i"
+	@echo "... src/pcl_odometry.s"
 	@echo "... src/pcl_to_tf.o"
 	@echo "... src/pcl_to_tf.i"
 	@echo "... src/pcl_to_tf.s"

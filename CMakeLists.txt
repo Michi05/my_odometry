@@ -26,5 +26,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-rosbuild_add_executable(pcl_to_tf src/pcl_to_tf.cpp)
+rosbuild_add_executable(
+    pcl_to_tf
+    src/pcl_odometry.cpp
+    src/pcl_to_tf.cpp
+    )
 #target_link_libraries(example ${PROJECT_NAME})
