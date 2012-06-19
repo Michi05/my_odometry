@@ -1,5 +1,9 @@
 FILE(REMOVE_RECURSE
+  "../srv_gen"
+  "../src/my_odometry/srv"
+  "../srv_gen"
   "CMakeFiles/ROSBUILD_gensrv_cpp"
+  "../srv_gen/cpp/include/my_odometry/AddTwoInts.h"
 )
 
 # Per-language clean rules from dependency scanning.

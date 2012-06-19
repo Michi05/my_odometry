@@ -1,4 +1,7 @@
 FILE(REMOVE_RECURSE
+  "../srv_gen"
+  "../src/my_odometry/srv"
+  "../srv_gen"
   "CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o"
   "CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o"
   "../bin/pcl_to_tf.pdb"

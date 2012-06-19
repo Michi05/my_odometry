@@ -4,7 +4,7 @@
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canonical targets will work.
+# Disable implicit rules so canoncical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -32,15 +32,12 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/r00t/ros_workspace/my_odometry
+CMAKE_SOURCE_DIR = /home/super/ros_workspace/my_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/r00t/ros_workspace/my_odometry/build
+CMAKE_BINARY_DIR = /home/super/ros_workspace/my_odometry/build
 
 # Utility rule file for tests.
-
-# Include the progress variables for this target.
-include CMakeFiles/tests.dir/progress.make
 
 CMakeFiles/tests:
 
@@ -57,6 +54,6 @@ CMakeFiles/tests.dir/clean:
 .PHONY : CMakeFiles/tests.dir/clean
 
 CMakeFiles/tests.dir/depend:
-	cd /home/r00t/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/super/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/super/ros_workspace/my_odometry /home/super/ros_workspace/my_odometry /home/super/ros_workspace/my_odometry/build /home/super/ros_workspace/my_odometry/build /home/super/ros_workspace/my_odometry/build/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tests.dir/depend
 
