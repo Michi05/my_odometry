@@ -16,6 +16,7 @@
 
   <depend package="pcl"/>
   <depend package="tf"/>
+  <depend package="tf2_msgs"/>
 
   <depend package="message_filters"/>
   <depend package="geometry_msgs"/>

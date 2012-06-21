@@ -10,6 +10,7 @@
 /home/super/ros_workspace/my_odometry/build/CMakeFiles/rospack_genmsg.dir
 /home/super/ros_workspace/my_odometry/build/CMakeFiles/rospack_genmsg_libexe.dir
 /home/super/ros_workspace/my_odometry/build/CMakeFiles/rospack_gensrv.dir
+/home/super/ros_workspace/my_odometry/build/CMakeFiles/rospack_gensrv_all.dir
 /home/super/ros_workspace/my_odometry/build/CMakeFiles/test.dir
 /home/super/ros_workspace/my_odometry/build/CMakeFiles/test-future.dir
 /home/super/ros_workspace/my_odometry/build/CMakeFiles/test-results.dir

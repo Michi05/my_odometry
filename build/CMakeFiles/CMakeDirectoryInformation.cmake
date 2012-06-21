@@ -12,6 +12,9 @@ SET(CMAKE_FORCE_UNIX_PATHS 1)
 SET(CMAKE_C_INCLUDE_PATH
   "../include"
   "/opt/ros/electric/stacks/vision_opencv/cv_bridge/include"
+  "/opt/ros/electric/stacks/geometry_experimental/tf2_msgs/msg_gen/cpp/include"
+  "/opt/ros/electric/stacks/geometry_experimental/tf2_msgs/srv_gen/cpp/include"
+  "/opt/ros/electric/stacks/common_msgs/actionlib_msgs/msg_gen/cpp/include"
   "/opt/ros/electric/stacks/common_msgs/nav_msgs/msg_gen/cpp/include"
   "/opt/ros/electric/stacks/common_msgs/nav_msgs/srv_gen/cpp/include"
   "/usr/include/opencv-2.3.1/opencv"
@@ -74,6 +77,7 @@ SET(CMAKE_C_INCLUDE_PATH
   "/usr/include/eigen3"
   "/opt/ros/electric/stacks/perception_pcl/cminpack/include"
   "/opt/ros/electric/stacks/perception_pcl/flann/include"
+  "../srv_gen/cpp/include"
   )
 SET(CMAKE_CXX_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
 SET(CMAKE_Fortran_INCLUDE_PATH ${CMAKE_C_INCLUDE_PATH})
