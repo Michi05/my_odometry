@@ -37,6 +37,8 @@ pcl/filters/filter.h
 -
 boost/thread.hpp
 -
+string
+-
 my_odometry/emptyRequest.h
 ../include/my_odometry/emptyRequest.h
 my_odometry/odometryAnswer.h
