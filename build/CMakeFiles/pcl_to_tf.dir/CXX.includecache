@@ -160,20 +160,6 @@ boost/thread.hpp
 pcl_odometry.hpp
 -
 
-/home/super/ros_workspace/my_odometry/src/pcl_to_tf.cpp
-ros/ros.h
-/home/super/ros_workspace/my_odometry/src/ros/ros.h
-std_msgs/String.h
-/home/super/ros_workspace/my_odometry/src/std_msgs/String.h
-sstream
--
-pcl_odometry.hpp
--
-boost/thread.hpp
--
-signal.h
--
-
 /opt/ros/electric/stacks/bullet/include/LinearMath/btMatrix3x3.h
 btVector3.h
 /opt/ros/electric/stacks/bullet/include/LinearMath/btVector3.h
