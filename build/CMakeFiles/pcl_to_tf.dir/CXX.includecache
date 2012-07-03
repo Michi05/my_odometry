@@ -159,6 +159,8 @@ boost/thread.hpp
 -
 pcl_odometry.hpp
 -
+Eigen/Geometry
+-
 
 /opt/ros/electric/stacks/bullet/include/LinearMath/btMatrix3x3.h
 btVector3.h
