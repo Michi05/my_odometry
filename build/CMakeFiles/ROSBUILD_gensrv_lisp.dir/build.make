@@ -4,7 +4,7 @@
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -32,303 +32,243 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/super/ros_workspace/my_odometry
+CMAKE_SOURCE_DIR = /home/r00t/ros_workspace/my_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/super/ros_workspace/my_odometry/build
+CMAKE_BINARY_DIR = /home/r00t/ros_workspace/my_odometry/build
 
 # Utility rule file for ROSBUILD_gensrv_lisp.
+
+# Include the progress variables for this target.
+include CMakeFiles/ROSBUILD_gensrv_lisp.dir/progress.make
 
 CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/emptyRequest.lisp
 CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
 CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_emptyRequest.lisp
-CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/odometryAnswer.lisp
-CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
-CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_odometryAnswer.lisp
 CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/statusMsg.lisp
 CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
 CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_statusMsg.lisp
+CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/odom_update_srv.lisp
+CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
+CMakeFiles/ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_odom_update_srv.lisp
 
 ../srv_gen/lisp/emptyRequest.lisp: ../srv/emptyRequest.srv
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/roslisp/scripts/genmsg_lisp.py
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/core/roslib/scripts/gendeps
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/roslib/bin/gendeps
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/PoseWithCovariance.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/nav_msgs/msg/Odometry.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Quaternion.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Twist.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/std_msgs/msg/Header.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Vector3.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg/TFMessage.msg
+../srv_gen/lisp/emptyRequest.lisp: ../msg/odom_answer.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Pose.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/TwistWithCovariance.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/TransformStamped.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Point.msg
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Transform.msg
 ../srv_gen/lisp/emptyRequest.lisp: ../manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/tools/rospack/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/core/roslib/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/core/rosbuild/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/core/roslang/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/rospy/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_traits/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/utilities/rostime/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_serialization/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/utilities/xmlrpcpp/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/tools/rosclean/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosgraph/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosparam/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosmaster/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosout/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/roslaunch/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/ros/tools/rosunit/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rostest/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosbag/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosbagmigration/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/vision_opencv/opencv2/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/vision_opencv/cv_bridge/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/eigen/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/perception_pcl/cminpack/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/perception_pcl/flann/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/perception_pcl/pcl/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/bullet/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry/angles/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosnode/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosmsg/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rostopic/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosservice/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/utilities/roswtf/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry/tf/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/actionlib_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/pluginlib/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/image_common/image_transport/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/bond_core/bond/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/bond_core/smclib/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/bond_core/bondcpp/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet_topic_tools/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/perception_pcl/pcl_ros/manifest.xml
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/perception_pcl/pcl/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry/tf/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry/tf/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/actionlib_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/bond_core/bond/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet/srv_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/msg_gen/generated
-../srv_gen/lisp/emptyRequest.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/srv_gen/generated
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/super/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_1)
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/roslang/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/rospy/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/roscpp/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/std_msgs/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/geometry_msgs/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/sensor_msgs/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/vision_opencv/opencv2/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/vision_opencv/cv_bridge/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/rosbag/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/ros/core/rosbuild/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/roslib/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/rosconsole/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/pluginlib/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/bond_core/bond/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/bond_core/smclib/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/bond_core/bondcpp/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/message_filters/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/rosservice/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet_topic_tools/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/bullet/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry/angles/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/rostest/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/roswtf/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry/tf/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/common_rosdeps/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/actionlib_msgs/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/orocos_kdl/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/python_orocos_kdl/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/kdl/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry/tf_conversions/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/share/nav_msgs/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/image_common/image_transport/manifest.xml
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/bond_core/bond/msg_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet/srv_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/msg_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/srv_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry/tf/msg_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry/tf/srv_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
+../srv_gen/lisp/emptyRequest.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/r00t/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ../srv_gen/lisp/emptyRequest.lisp, ../srv_gen/lisp/_package.lisp, ../srv_gen/lisp/_package_emptyRequest.lisp"
-	/opt/ros/electric/stacks/ros_comm/clients/roslisp/scripts/genmsg_lisp.py /home/super/ros_workspace/my_odometry/srv/emptyRequest.srv
+	/opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py /home/r00t/ros_workspace/my_odometry/srv/emptyRequest.srv
 
 ../srv_gen/lisp/_package.lisp: ../srv_gen/lisp/emptyRequest.lisp
 
 ../srv_gen/lisp/_package_emptyRequest.lisp: ../srv_gen/lisp/emptyRequest.lisp
 
-../srv_gen/lisp/odometryAnswer.lisp: ../srv/odometryAnswer.srv
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/roslisp/scripts/genmsg_lisp.py
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/core/roslib/scripts/gendeps
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/PoseWithCovariance.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/msg/Odometry.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/Quaternion.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/Twist.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg/Header.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/Vector3.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/msg/TFMessage.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/Pose.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/TwistWithCovariance.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/TransformStamped.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/Point.msg
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg/Transform.msg
-../srv_gen/lisp/odometryAnswer.lisp: ../manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/tools/rospack/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/core/roslib/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/core/rosbuild/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/core/roslang/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/rospy/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_traits/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/utilities/rostime/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_serialization/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/utilities/xmlrpcpp/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/tools/rosclean/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosgraph/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosparam/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosmaster/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosout/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/roslaunch/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/ros/tools/rosunit/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rostest/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosbag/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosbagmigration/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/vision_opencv/opencv2/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/vision_opencv/cv_bridge/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/eigen/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/perception_pcl/cminpack/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/perception_pcl/flann/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/perception_pcl/pcl/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/bullet/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry/angles/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosnode/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosmsg/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rostopic/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosservice/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/utilities/roswtf/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry/tf/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/actionlib_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/pluginlib/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/image_common/image_transport/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/bond_core/bond/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/bond_core/smclib/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/bond_core/bondcpp/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet_topic_tools/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/perception_pcl/pcl_ros/manifest.xml
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/perception_pcl/pcl/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry/tf/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry/tf/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/actionlib_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/bond_core/bond/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet/srv_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/msg_gen/generated
-../srv_gen/lisp/odometryAnswer.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/srv_gen/generated
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/super/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_2)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ../srv_gen/lisp/odometryAnswer.lisp, ../srv_gen/lisp/_package.lisp, ../srv_gen/lisp/_package_odometryAnswer.lisp"
-	/opt/ros/electric/stacks/ros_comm/clients/roslisp/scripts/genmsg_lisp.py /home/super/ros_workspace/my_odometry/srv/odometryAnswer.srv
-
-../srv_gen/lisp/_package.lisp: ../srv_gen/lisp/odometryAnswer.lisp
-
-../srv_gen/lisp/_package_odometryAnswer.lisp: ../srv_gen/lisp/odometryAnswer.lisp
-
 ../srv_gen/lisp/statusMsg.lisp: ../srv/statusMsg.srv
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/roslisp/scripts/genmsg_lisp.py
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/core/roslib/scripts/gendeps
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/roslib/bin/gendeps
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/PoseWithCovariance.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/nav_msgs/msg/Odometry.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Quaternion.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Twist.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/std_msgs/msg/Header.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Vector3.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg/TFMessage.msg
+../srv_gen/lisp/statusMsg.lisp: ../msg/odom_answer.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Pose.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/TwistWithCovariance.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/TransformStamped.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Point.msg
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Transform.msg
 ../srv_gen/lisp/statusMsg.lisp: ../manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/tools/rospack/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/core/roslib/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/core/rosbuild/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/core/roslang/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/rospy/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_traits/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/utilities/rostime/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_serialization/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/utilities/xmlrpcpp/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/tools/rosclean/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosgraph/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosparam/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosmaster/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosout/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/roslaunch/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/ros/tools/rosunit/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rostest/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosbag/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosbagmigration/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/vision_opencv/opencv2/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/vision_opencv/cv_bridge/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/eigen/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/perception_pcl/cminpack/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/perception_pcl/flann/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/perception_pcl/pcl/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/bullet/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry/angles/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosnode/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosmsg/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rostopic/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/rosservice/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/utilities/roswtf/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry/tf/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/actionlib_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/pluginlib/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/image_common/image_transport/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/bond_core/bond/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/bond_core/smclib/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/bond_core/bondcpp/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet_topic_tools/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/perception_pcl/pcl_ros/manifest.xml
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/sensor_msgs/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/perception_pcl/pcl/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry/tf/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry/tf/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/actionlib_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/common_msgs/nav_msgs/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/bond_core/bond/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/nodelet_core/nodelet/srv_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/msg_gen/generated
-../srv_gen/lisp/statusMsg.lisp: /opt/ros/electric/stacks/driver_common/dynamic_reconfigure/srv_gen/generated
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/super/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_3)
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/roslang/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/rospy/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/roscpp/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/std_msgs/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/geometry_msgs/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/sensor_msgs/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/vision_opencv/opencv2/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/vision_opencv/cv_bridge/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/rosbag/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/ros/core/rosbuild/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/roslib/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/rosconsole/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/pluginlib/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/bond_core/bond/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/bond_core/smclib/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/bond_core/bondcpp/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/message_filters/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/rosservice/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet_topic_tools/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/bullet/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry/angles/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/rostest/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/roswtf/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry/tf/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/common_rosdeps/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/actionlib_msgs/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/orocos_kdl/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/python_orocos_kdl/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/kdl/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry/tf_conversions/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/share/nav_msgs/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/image_common/image_transport/manifest.xml
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/bond_core/bond/msg_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet/srv_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/msg_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/srv_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry/tf/msg_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry/tf/srv_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
+../srv_gen/lisp/statusMsg.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/r00t/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ../srv_gen/lisp/statusMsg.lisp, ../srv_gen/lisp/_package.lisp, ../srv_gen/lisp/_package_statusMsg.lisp"
-	/opt/ros/electric/stacks/ros_comm/clients/roslisp/scripts/genmsg_lisp.py /home/super/ros_workspace/my_odometry/srv/statusMsg.srv
+	/opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py /home/r00t/ros_workspace/my_odometry/srv/statusMsg.srv
 
 ../srv_gen/lisp/_package.lisp: ../srv_gen/lisp/statusMsg.lisp
 
 ../srv_gen/lisp/_package_statusMsg.lisp: ../srv_gen/lisp/statusMsg.lisp
 
+../srv_gen/lisp/odom_update_srv.lisp: ../srv/odom_update_srv.srv
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/roslib/bin/gendeps
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/PoseWithCovariance.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/nav_msgs/msg/Odometry.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Quaternion.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Twist.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/std_msgs/msg/Header.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Vector3.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg/TFMessage.msg
+../srv_gen/lisp/odom_update_srv.lisp: ../msg/odom_answer.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Pose.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/TwistWithCovariance.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/TransformStamped.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Point.msg
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/msg/Transform.msg
+../srv_gen/lisp/odom_update_srv.lisp: ../manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/roslang/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/rospy/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/roscpp/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/std_msgs/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/geometry_msgs/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/sensor_msgs/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/vision_opencv/opencv2/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/vision_opencv/cv_bridge/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/rosbag/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/ros/core/rosbuild/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/roslib/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/rosconsole/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/pluginlib/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/bond_core/bond/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/bond_core/smclib/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/bond_core/bondcpp/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/message_filters/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/rosservice/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet_topic_tools/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/bullet/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry/angles/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/rostest/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/roswtf/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry/tf/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/common_rosdeps/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/actionlib_msgs/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/orocos_kdl/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/python_orocos_kdl/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/orocos_kinematics_dynamics/kdl/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry/tf_conversions/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/share/nav_msgs/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/image_common/image_transport/manifest.xml
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/bond_core/bond/msg_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/nodelet_core/nodelet/srv_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/msg_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/dynamic_reconfigure/srv_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry/tf/msg_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry/tf/srv_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
+../srv_gen/lisp/odom_update_srv.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/r00t/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ../srv_gen/lisp/odom_update_srv.lisp, ../srv_gen/lisp/_package.lisp, ../srv_gen/lisp/_package_odom_update_srv.lisp"
+	/opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py /home/r00t/ros_workspace/my_odometry/srv/odom_update_srv.srv
+
+../srv_gen/lisp/_package.lisp: ../srv_gen/lisp/odom_update_srv.lisp
+
+../srv_gen/lisp/_package_odom_update_srv.lisp: ../srv_gen/lisp/odom_update_srv.lisp
+
 ROSBUILD_gensrv_lisp: CMakeFiles/ROSBUILD_gensrv_lisp
 ROSBUILD_gensrv_lisp: ../srv_gen/lisp/emptyRequest.lisp
 ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
 ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_emptyRequest.lisp
-ROSBUILD_gensrv_lisp: ../srv_gen/lisp/odometryAnswer.lisp
-ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
-ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_odometryAnswer.lisp
 ROSBUILD_gensrv_lisp: ../srv_gen/lisp/statusMsg.lisp
 ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
 ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_statusMsg.lisp
+ROSBUILD_gensrv_lisp: ../srv_gen/lisp/odom_update_srv.lisp
+ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package.lisp
+ROSBUILD_gensrv_lisp: ../srv_gen/lisp/_package_odom_update_srv.lisp
 ROSBUILD_gensrv_lisp: CMakeFiles/ROSBUILD_gensrv_lisp.dir/build.make
 .PHONY : ROSBUILD_gensrv_lisp
 
@@ -341,6 +281,6 @@ CMakeFiles/ROSBUILD_gensrv_lisp.dir/clean:
 .PHONY : CMakeFiles/ROSBUILD_gensrv_lisp.dir/clean
 
 CMakeFiles/ROSBUILD_gensrv_lisp.dir/depend:
-	cd /home/super/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/super/ros_workspace/my_odometry /home/super/ros_workspace/my_odometry /home/super/ros_workspace/my_odometry/build /home/super/ros_workspace/my_odometry/build /home/super/ros_workspace/my_odometry/build/CMakeFiles/ROSBUILD_gensrv_lisp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/r00t/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build/CMakeFiles/ROSBUILD_gensrv_lisp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ROSBUILD_gensrv_lisp.dir/depend
 

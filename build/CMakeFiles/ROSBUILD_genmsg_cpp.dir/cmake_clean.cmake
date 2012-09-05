@@ -1,8 +1,12 @@
 FILE(REMOVE_RECURSE
+  "../msg_gen"
   "../srv_gen"
+  "../msg_gen"
+  "../srv_gen"
+  "../src/my_odometry/msg"
   "../src/my_odometry/srv"
-  "../srv_gen"
   "CMakeFiles/ROSBUILD_genmsg_cpp"
+  "../msg_gen/cpp/include/my_odometry/odom_answer.h"
 )
 
 # Per-language clean rules from dependency scanning.

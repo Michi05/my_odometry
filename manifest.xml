@@ -14,9 +14,13 @@
   <depend package="sensor_msgs"/>
   <depend package="cv_bridge"/>
 
-  <depend package="pcl"/>
+  <depend package="pcl_ros"/> <!-- For the conversions mainly. It also redefines some stuff and adds methods to existing classes -->
+<!--   <depend package="pcl"/> Actual PCL library
+  <rosdep name="libpcl-1.4-all-dev"/> -->
+
   <depend package="tf"/>
   <depend package="tf2_msgs"/>
+  <depend package="tf_conversions"/>
 
   <depend package="message_filters"/>
   <depend package="geometry_msgs"/>
@@ -26,8 +30,6 @@
   <depend package="cv_bridge"/>
   <depend package="std_msgs"/>
   <depend package="image_transport"/>
-
-  <depend package="pcl_ros"/>
 
 </package>
 

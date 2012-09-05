@@ -1,7 +1,10 @@
 FILE(REMOVE_RECURSE
+  "../msg_gen"
   "../srv_gen"
+  "../msg_gen"
+  "../srv_gen"
+  "../src/my_odometry/msg"
   "../src/my_odometry/srv"
-  "../srv_gen"
   "CMakeFiles/test-results"
 )
 
