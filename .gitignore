@@ -1,0 +1,14 @@
+
+    # .gitignore file for ignoring compiled files
+
+
+# Folders to exclude (don't forget the final slash)
+bin/
+#build/ # Seems to be only for makefiles; that's fine
+
+# Python precompiled (.pyc)
+*.pyc
+
+# Already shared files must be excluded manually
+#by using "git rm --cached filename" command
+
