@@ -119,6 +119,7 @@ public:
 	  static const char PARAM_KEY_MANUAL_MODE[];
 	  static const char PARAM_KEY_IGNORE_TIME[];
 	  static const char PARAM_KEY_ACCURACY[];
+	  static const char PARAM_KEY_ROTATION_ACCURACY[];
 
 	  static const char PARAM_KEY_KINECT_ROLL[];
 	  static const char PARAM_KEY_KINECT_PITCH[];
@@ -161,6 +162,7 @@ public:
 	  static const bool PARAM_DEFAULT_MANUAL_MODE;
 	  static const bool PARAM_DEFAULT_IGNORE_TIME;
 	  static const double PARAM_DEFAULT_ACCURACY;
+	  static const double PARAM_DEFAULT_ROTATION_ACCURACY;
 
 
 	  static const double PARAM_DEFAULT_KINECT_ROLL;
@@ -168,8 +170,15 @@ public:
 	  static const double PARAM_DEFAULT_KINECT_YAW;
 	
 	
+	  
+		/////////////////////////////////////////////////////////////////
+		//////////// ENUM FOR DEFINING THE STATUS VALUES ////////////////
+		/////////////////////////////////////////////////////////////////
 	
-
+	  enum { ERROR_STATUS =-1, UNLOADED=0, INITIALIZED, RUNNING, WAITING, UNRELIABLE_RESULT};
+	  
+	  
+	  
 	//////////////////////////////////////////////////////////////////////
 	//////////// PARAMETERS FOR THE FILTERS AND ALGORITHM ////////////////
 	//////////////////////////////////////////////////////////////////////
@@ -223,9 +232,8 @@ public:
 	std::string outputOdometryAnswer_topic;
 	
 	///////// PCL_Odometry Configuration:
-	bool manualMode;
-	bool ignoreTime;
-	double measureAccuracy;
+	bool manualMode, ignoreTime;
+	double measureAccuracy, rotationAccuracy;
 
 	//////// Physical Description Configuration:
 	double kinectRoll,kinectPitch, kinectYaw;
@@ -234,13 +242,16 @@ public:
 	////////////////////////////////////////////////////
 	//////////// CLASS SCOPE DATA MEMBERS //////////////
 	////////////////////////////////////////////////////
-	// TODO: document as well??
+	// A mutex variable is used as a lock for the callbacks
 	boost::mutex callback_mutex;
-	Eigen::Matrix4f globalTransform, lastRelativeTransform;
+	// The transform frames to describe the global position of the robot, the last movement
+	//and the position of the camera on the robot
 	tf::Transform globalTF, lastRelativeTF, fixed_camera_transform;
-//	ros::Publisher global_odom_publisher, relative_odom_publisher;
+	// Topic publishers for point clouds and the odometry general answer
 	ros::Publisher pcl_pub_aligned, pcl_pub_final, pcl_pub_initial, odom_answer_publisher;
+	// Topic subscribers for the incoming point cloud and the "fixed_camera_transform" updates
 	ros::Subscriber pcl_sub, camera_tf_sub;
+	// A pointer to the previous PC at any time
 	PointCloudT::Ptr previous;
 	
 	/** Is initialised flag */
@@ -255,7 +266,7 @@ public:
 	
 	
 	/** Services **/
-	//TODO: group services or structure them in a coherent way
+	//IMPROVEMENT IDEA: group services or structure them in a coherent way
 	ros::ServiceServer *server_resetGlobals;
 	// Status of the odometry process
 	int odomStatus;
@@ -336,7 +347,7 @@ public:
 	  /**
 	   * Activate the noise filter (that is, put
 	   * the flag as "true" and sets it according to the parameters
-	   *   @param radDist - maximums radius distance in (...TODO: meters?...)
+	   *   @param radDist - maximums radius distance in meters
 	   *					between each point and the others for them to be
 	   *					considered neighbours.
 	   *   @param noOfNeighbours - minimum number of neighbours for a
@@ -362,7 +373,8 @@ private:
 
     
 	  /**
-	   * Publishes an odometry message to the ROS environment. (TODO: something else to say?)
+	   * Publishes an ROS-odometry-type message to the ROS environment with
+	   * data from the tMatrix transform and using the passed publisher
 	   *   
 	   *   @param odom_publisher - the topic publisher object in which to
 	   *   							put the message in order to send it.
@@ -393,7 +405,16 @@ private:
 	   */
 	void apply_filters(PointCloudT::ConstPtr pointCloud1_in, PointCloudT::Ptr &pointCloud1_out);
 
-	// TODO: Document
+	  /**
+	   * Removes the most external (less centered) points of a pointcloud according to x,y,z with respect to 1.0
+	   * That is: it keeps all the points in "x times the width", "y times the height" and "z times the depth"
+	   * and removes the others
+	   *   
+	   *   @param pointCloud1_out - the cloud to trim
+	   *   @param x - the part to keep, over one, of the width
+	   *   @param y - the part to keep, over one, of the height
+	   *   @param z - the part to keep, over one, of the depth
+	   */
 	void trimPreviousCloud(PointCloudT::Ptr &pointCloud1_out, double x = 0.75, double y = 0.9, double z = 0.9);
 
 	  /**
@@ -406,14 +427,80 @@ private:
 	   *   @param tf_result - the TF data stored in a tf::Transform
 	   */
 	void filter_resulting_TF(tf::Transform &tf_result);
+
 	
-	// TODO: Document
+	/**
+	   * Rounds any Real number to the specified amount of decimals.
+	   *   
+	   *   @param value - the value to be rounded and returned
+	   *   @param noDecimals - the number of decimals to be left
+	   */
 	double round(double value, int noDecimals);
+	
+	/**
+	   * Rounds small values of a transform frame to prevent noise from
+	   * being interpreted as movement.
+	   *   
+	   *   @param tf_result - the tf to be rounded
+	   *   @param margin - the value for the interval to be considered
+	   *   "too near to zero": -margin < tooSmall < margin
+	   */
 	void round_near_zero_values(tf::Transform &tf_result, double margin);
-	bool generate_tf(tf::Transform &tf, double roll, double pitch, double yaw);	void rotate_tf(tf::Transform &tf_result, double roll, double pitch, double yaw);
+	
+	/**
+	   * Generates a 6D transform frame describing a position (0, 0, 0) and
+	   * orientation according to the passed values.
+	   *   
+	   *   @param tf - the tf variable in which to store the result
+	   *   @param roll - the X axis rotation to be applied to tf
+	   *   @param pitch - the Y axis rotation to be applied to tf
+	   *   @param yaw - the Z axis rotation to be applied to tf
+	   */
+	bool generate_tf(tf::Transform &tf, double roll, double pitch, double yaw);
+	
+	/**
+	   * Rotates a calculated transform frame according to the passed values.
+	   * The resulting transform should  represent the same movement just from
+	   * a different reference system.
+	   *   
+	   *   @param tf_result - the calculated transform to be rotated
+	   *   @param roll - the X axis rotation to be applied to tf_result
+	   *   @param pitch - the Y axis rotation to be applied to tf_result
+	   *   @param yaw - the Z axis rotation to be applied to tf_result
+	   */
+	void rotate_tf(tf::Transform &tf_result, double roll, double pitch, double yaw);
+
+	/**
+	   * Rotates a calculated transform frame according to the fixed transform that
+	   * describes the relative position of the camera. The resulting transform should
+	   * represent the same movement just from a different reference system.
+	   *   
+	   *   @param tf_result - the calculated transform to be rotated
+	   *   @param fixedTF - the fixed transform describing the camera position
+	   */
 	void rotate_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
+
+	  /**
+	   * Automatically prints all the data in a transform frame stored as a "tf Transform"
+	   *   
+	   *   @param newTF - the transform variable containing the data to be printed
+	   */
 	void printTransform(tf::Transform &newTF);
+
+	  /**
+	   * Automatically prints all the data in a transform frame stored as a Matrix4f
+	   *   
+	   *   @param tMatrix - the matrix containing the data to be printed
+	   */
 	void printMatrix4f(Eigen::Matrix4f &tMatrix);
+
+	  /**
+	   * Updates the status code for the algorithm according to the parameter
+	   * Right now it is an integer but that can be changed easily
+	   *   
+	   *   @param status - the number/code to be stored in the odomStatus variable
+	   */
+	void setOdomStatus(int status);
 
 
 
@@ -433,10 +520,20 @@ private:
 	   */
 	void broadcastTransform(tf::Transform &newTF, std::string tfChannel, std::string tfParent="map");
 
-	/**
-	 * TODO: document this
-	 */
+	  /**
+	   * Calculates the linear movement in a euclidean space in order to
+	   * determine if the movement is to big to be reliable.
+	   *   
+	   *   @param t - transform frame from which to obtain data
+	   */
 	double transformToDistance(tf::Transform t);
+
+	  /**
+	   * Calculates the amount of rotation in order to have a measure
+	   * to determine if the rotation is to big to be reliable.
+	   *   
+	   *   @param t - transform frame from which to obtain data
+	   */
 	double transformToRotation(tf::Transform t);
 
 	  /**
@@ -541,8 +638,17 @@ private:
 	//////////// SERVICE HANDLERS AND LAUNCHER /////////////////
 	////////////////////////////////////////////////////////////
 
-	// TODO: document
+	  /**
+	   * Writes/stores all the important data to an output message including
+	   * the status code  of the algorithm and the global and relative tf and
+	   * their odometry-type version. It includes
+	   * 
+	   *   @param res - the variable in which to store the data to send
+	   *
+	   *   @return true always if there is no internal unexpected exception
+	   */
 	bool fill_in_answer(my_odometry::odom_answer &res);
+
 	  /**
 	   * Triggers the ICP calculantion of a new tf when requested from the corresponding service
 	   * by using the last stored PCL and the first one received after the request.
@@ -556,6 +662,7 @@ private:
 	   */
 	bool update_odometry(	my_odometry::odom_update_srv::Request  &req,
 							my_odometry::odom_update_srv::Response &res );
+
 	  /**
 	   * Sends the last status code as an answer to the corresponding service.
 	   *   
@@ -583,7 +690,13 @@ private:
 	// Callbacks!!
 public:
 	  /**
-TODO:
+	   * It indicates the reception of a new transform frame to
+	   * substitute the existing "fixed_camera_transform" variable.
+	   * The new tf is suppossed to be the position of the camera
+	   * with respect to the considered centre of coordinates in
+	   * order to put the tfs in relation to that centre.
+	   *   
+	   *   @param newTF- the new received TF
 	   */
 	void cameraTF_callback(const tf::tfMessageConstPtr& newTF);
 

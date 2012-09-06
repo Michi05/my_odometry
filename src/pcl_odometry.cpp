@@ -64,6 +64,7 @@ const char   odometryComm::PARAM_KEY_TOPIC_ODOMETRY_ANSWER[] =    "topic_odometr
 const char   odometryComm::PARAM_KEY_MANUAL_MODE[] =    "odometry_manual_mode";
 const char   odometryComm::PARAM_KEY_IGNORE_TIME[] =    "odometry_ignore_time";
 const char   odometryComm::PARAM_KEY_ACCURACY[] =    "odometry_measure_accuracy";
+const char   odometryComm::PARAM_KEY_ROTATION_ACCURACY[] =    "odometry_rotation_accuracy";
 
 const char   odometryComm::PARAM_KEY_KINECT_ROLL[] =    "kinect_roll";
 const char   odometryComm::PARAM_KEY_KINECT_PITCH[] =    "kinect_pitch";
@@ -106,6 +107,7 @@ const char   odometryComm::PARAM_DEFAULT_TOPIC_ODOMETRY_ANSWER[] =    "odometry_
 const bool   odometryComm::PARAM_DEFAULT_MANUAL_MODE = true;
 const bool   odometryComm::PARAM_DEFAULT_IGNORE_TIME = true;
 const double   odometryComm::PARAM_DEFAULT_ACCURACY = 0.01;
+const double   odometryComm::PARAM_DEFAULT_ROTATION_ACCURACY = 0.0001;
 
 const double   odometryComm::PARAM_DEFAULT_KINECT_ROLL = 0.0f;
 const double   odometryComm::PARAM_DEFAULT_KINECT_PITCH = 0.0f;
@@ -134,7 +136,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		lastRelativeTF(tf::Transform::getIdentity()),
 		mIsInitialised(false),
 		mSpinner(0),
-		odomStatus(0) {
+		odomStatus(UNLOADED) {
 	}
 	//=============================================================================
 	odometryComm::~odometryComm() {
@@ -213,6 +215,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.param(PARAM_KEY_MANUAL_MODE, manualMode, PARAM_DEFAULT_MANUAL_MODE);
 		    nodeHandlePrivate.param(PARAM_KEY_IGNORE_TIME, ignoreTime, PARAM_DEFAULT_IGNORE_TIME);
 		    nodeHandlePrivate.param(PARAM_KEY_ACCURACY, measureAccuracy, PARAM_DEFAULT_ACCURACY);
+		    nodeHandlePrivate.param(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy, PARAM_DEFAULT_ROTATION_ACCURACY);
 
 
 		    nodeHandlePrivate.param(PARAM_KEY_KINECT_ROLL, kinectRoll, PARAM_DEFAULT_KINECT_ROLL);
@@ -259,6 +262,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.setParam(PARAM_KEY_MANUAL_MODE, manualMode);
 		    nodeHandlePrivate.setParam(PARAM_KEY_IGNORE_TIME, ignoreTime);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ACCURACY, measureAccuracy);
+		    nodeHandlePrivate.setParam(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy);
 
 		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_ROLL, kinectRoll);
 		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_PITCH, kinectPitch);
@@ -283,8 +287,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    //Create publisher with buffer size set to 1 and latching on. 
 		    // The publisher should basically just always contain the latest state.
 			int output_queue_size = 1;
-//			global_odom_publisher = nodeHandlePrivate.advertise<nav_msgs::Odometry> (outputGlobalOdometry_topic, output_queue_size, true); // nav_msgs/Odometry - primary output
-//			relative_odom_publisher = nodeHandlePrivate.advertise<nav_msgs::Odometry> (outputRelativeOdometry_topic, output_queue_size, true); // nav_msgs/Odometry
 			pcl_pub_aligned = nodeHandlePrivate.advertise<PointCloudT> (outputAlignedCloud_topic, output_queue_size, true);
 			pcl_pub_initial = nodeHandlePrivate.advertise<PointCloudT> (outputInitialCloud_topic, output_queue_size, true);
 			pcl_pub_final = nodeHandlePrivate.advertise<PointCloudT> (outputFilteredCloud_topic, output_queue_size, true);
@@ -314,9 +316,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  mIsInitialised = true;
 		  
 
-		  //TODO: Should this go here?
-		  // Initialise status (no error and not-yet waiting for data)
-		  odomStatus = 1;
 		  // Launch services
 		  ros::NodeHandle nHandle("~");
 		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("updateOdometry", &odometryComm::update_odometry, this));
@@ -329,6 +328,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  mSpinner = new ros::AsyncSpinner(1);
 		  mSpinner->start();
 		  
+		  // Initialise status (no error and not-yet waiting for data)
+		  setOdomStatus(INITIALIZED);
 		  
 		  ROS_INFO("Completely Initialized");
 
@@ -504,6 +505,10 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_ACCURACY,
 				  measureAccuracy);
+		  printf("    _%s:=%f\n",
+				  PARAM_KEY_ROTATION_ACCURACY,
+				  rotationAccuracy);
+
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_KINECT_ROLL,
 				  kinectRoll);
@@ -683,7 +688,13 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 	
 	//=============================================================================
+
+	void odometryComm::setOdomStatus(int status) {
+		odomStatus = status;
+	}
 	
+	//=============================================================================
+
 	bool odometryComm::generate_tf(tf::Transform &tf, double roll, double pitch, double yaw) {
 		if (&tf==0)
 			tf = tf::Transform::getIdentity();
@@ -769,10 +780,13 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	//=============================================================================
 	double odometryComm::transformToRotation(tf::Transform t){
 		double rotSqr = t.getRotation().getW()*t.getRotation().getW();
-		if (rotSqr > double(0.9999)) // TODO: shouldn't be an arbitrary number
-			rotSqr = double(1.0);
+		double diff = double(1.00000) - rotSqr;
+		// If the diff between 1.0 and rotSqr is too small
+		//then it is considered 0.0
+		if (diff < rotationAccuracy)
+			return double(0.0);
 //		printf("ROTATION %f: \r\n sqrt(1-%f) = sqrt(%f) = %f != %f\r\n\r\n", t.getRotation().getW(), rotSqr, double(1.0)-rotSqr, sqrt(double(1.0)-rotSqr));
-	    return sqrt(double(1.0)-rotSqr);
+	    return diff;
 	}
 
 	//=============================================================================
@@ -874,7 +888,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			}
 			else
 				ROS_ERROR("The algorithm is supposed to be run with positive values for the MAIN parameters but one or several aren't: maxIterations = %d, epsilon = %f, maxDistance = %f", maxIterations, epsilon, maxDistance);
-//TODO: Is this the best way?
 			std::cout << std::endl << std::endl;
 				if (euclideanDistance > 0)
 					icp.setEuclideanFitnessEpsilon (euclideanDistance);
@@ -1055,12 +1068,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			ROS_INFO("No previous PointCloud. First PointCloud read.");
 			trimPreviousCloud(pointCloud1_out, cloud_trim_x, cloud_trim_y, cloud_trim_z);
 			previous = pointCloud1_out;
+			// Status waiting
+			setOdomStatus(WAITING);
 			return;
 		} // else:
-		
-		
-		
-		
+				
 		
 		// Actual processing
 		Eigen::Matrix4f tf_result = process2CloudsICP(previous, pointCloud1_out);
@@ -1078,7 +1090,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		ROS_WARN("Raw distance/rotation: %f / %f", transformToDistance(transform_result), transformToRotation(transform_result));
 		if (transformToDistance(transform_result) > maxDistance) {
 			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance", transformToDistance(transform_result));
+			
+			// Status running
+			setOdomStatus(UNRELIABLE_RESULT);
 		}
+		else setOdomStatus(WAITING);
 
 		if (transformToDistance(transform_result)  == 0) {
 			ROS_WARN("THE POSITION IN SPACE HASN'T CHANGED!!");
@@ -1108,8 +1124,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//odometry messages.
 		broadcastTransform(globalTF, "globalTF");
 		broadcastTransform(lastRelativeTF, "relativeTF");
-//		publishOdom(global_odom_publisher, globalTF);
-//		publishOdom(relative_odom_publisher, lastRelativeTF);
 		
 		my_odometry::odom_answer newAnswer;
 		fill_in_answer(newAnswer);
