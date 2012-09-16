@@ -951,28 +951,53 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			// Run the calculations (returns nothing but copies in "cloud_aligned" the
 			//input PC (cloud_initial) transformed accordingly to the result
 			PointCloudT cloud_aligned; // The aligned cloud will be ignored
+
+			
+// **********************************************************			
+// ************** Trying 3 ways version *********************
+// **********************************************************
+
+// Method specification:			icp.align(cloud_aligned, const Eigen::Matrix4f &guess); // If there's any guess
 			
 			
-			// Trying 3 ways version
 			Eigen::Matrix4f final_result, guess;
 			double final_score = 1;
 
-
-			generate_tf(guess, 0, 0, 0);
-			generate_tf(guess, 0, -0.2, 0);
-			generate_tf(guess, 0, 0.2, 0);
-			
+			// Without any guess:
 			icp.align(cloud_aligned);
+			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
+				final_score = icp.getFitnessScore();
+				final_result = icp.getFinalTransformation();
+			}
 			
-//			icp.align(cloud_aligned, const Eigen::Matrix4f &guess); // If there's any guess
+			// Guessing negative pitch:
+			generate_tf(guess, 0, -0.2, 0);
+			icp.align(cloud_aligned, guess); // If there's any guess
+			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
+				final_score = icp.getFitnessScore();
+				final_result = icp.getFinalTransformation();
+			}
+			
+			// Guessing positive pitch:
+			generate_tf(guess, 0, 0.2, 0);
+			icp.align(cloud_aligned, guess);
+			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
+				final_score = icp.getFitnessScore();
+				final_result = icp.getFinalTransformation();
+			}
+
+
+			// Just in case the cloud_aligned is published
+			//is better to tag it as timestamp==0 to avoid problems
 			cloud_aligned.header.stamp = ros::Time(0);
 
-			if (icp.hasConverged()) {
-				std::cout << "has converged with score: " << icp.getFitnessScore() << " after " << (ros::Time::now()-ini_time) << " for " << cloud_aligned.points.size() << " points." << std::endl;
+			
+			if (final_score < 1.0) {
+				std::cout << "has converged with score: " << final_score << " after " << (ros::Time::now()-ini_time) << " for " << cloud_aligned.points.size() << " points." << std::endl;
 			}
 			else
 				std::cout << "has NOT converged after " << (ros::Time::now()-ini_time) << std::endl;
-		return icp.getFinalTransformation();
+		return final_result;
 	}
 	
 	
