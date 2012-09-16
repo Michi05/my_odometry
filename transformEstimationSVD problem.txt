@@ -1,0 +1,12 @@
+pcl_to_tf:
+	/usr/include/eigen3/Eigen/src/Core/ProductBase.h:108:
+		Eigen::ProductBase<Derived, Lhs, Rhs>::ProductBase(const Lhs&, const Rhs&)
+[with Derived =
+Eigen::GeneralProduct<Eigen::Matrix<float, -0x00000000000000001, -0x00000000000000001>,
+Eigen::Transpose<const Eigen::Matrix<float, -0x00000000000000001, -0x00000000000000001> >, 5>,
+Lhs = Eigen::Matrix<float, -0x00000000000000001, -0x00000000000000001>,
+Rhs = Eigen::Transpose<const Eigen::Matrix<float, -0x00000000000000001, -0x00000000000000001> >]:
+
+Assertion `lhs.cols() == rhs.rows() && "invalid matrix product" && "if you wanted a coeff-wise or a dot product use the respective explicit functions"' failed.
+Aborted (core dumped)
+

@@ -1,0 +1,10 @@
+{activate_depth_filter: true, activate_noise_filter: false, activate_resolution_filter: true,
+  cloud_trim_x: 0.85, cloud_trim_y: 0.9, cloud_trim_z: 0.9, global_odometry_out_topic: globalOdometry,
+  icp_epsilon: 1.0e-09, icp_euclidean_distance: 1.0e-09, icp_max_distance: 0.5, icp_max_iterations: 120,
+  icp_ransac_iterations: 1000, icp_ransac_threshold: 0.1, kinect_pitch: 0.0, kinect_roll: 0.0,
+  kinect_yaw: 0.0, max_depth: 3.5, min_depth: 1.1, noise_neighbours: 0, noise_radius: 0.0,
+  odometry_ignore_time: true, odometry_manual_mode: false, odometry_measure_accuracy: 0.01,
+  odometry_rotation_accuracy: 0.0001, relative_odometry_out_topic: lastRelativeOdometry,
+  resolution_leaf_size: 0.009999999776482582, topic_aligned_cloud: aligned_cloud,
+  topic_camera_tf: input_camera_tf, topic_filtered_cloud: final_filtered_cloud, topic_initial_cloud: initial_cloud,
+  topic_input_pcl: /camera/depth_registered/points, topic_input_str: inputStr, topic_odometry_answer: odometry_answer}
