@@ -328,7 +328,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  mSpinner = new ros::AsyncSpinner(1);
 		  mSpinner->start();
 		  
-		  // Initialise status (no error and not-yet waiting for data)
+		  // The fixed camera tf needs to be initialized according to rotations
+		  fixed_camera_transform = tf::Transform::getIdentity();
+		  rotate_tf(fixed_camera_transform, kinectRoll, kinectPitch, kinectYaw);
+
+			// Initialise status (no error and not-yet waiting for data)
 		  setOdomStatus(INITIALIZED);
 		  
 		  ROS_INFO("Completely Initialized");
@@ -580,42 +584,50 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 	//=============================================================================
 	void odometryComm::trimPreviousCloud(PointCloudT::Ptr &ptcld, double x, double y, double z) {
-		// A temporary cloud is used as the specification doesn't 
-		//guarantee to work if storing result to the original cloud.
+		// A temporary cloud is used as the "pcl::PassThrough" specification doesn't 
+		//guarantee to work if storing result back into the original cloud.
 		PointCloudT::Ptr temp(new PointCloudT);
 		if (ptcld == 0 || ptcld->points.size() < 1) {
 			return; // No action without points
 		}
 
-		if ((x = std::abs(x)) <= 1) {
-			if (x > 1) x = 1;
+// Once the absolute value is taken,
+//values above 1 mean 100% of the image
+		x = std::abs(x);
+		if (x < 1) {
 			pcl::PassThrough<PointT> pass;
 			pass.setInputCloud (ptcld);
 			pass.setFilterFieldName ("x");
 			pass.setFilterLimits (-x, x);
+			// Filter between -x and x. Then store it back to ptcld
 			pass.filter (*temp);
 			ptcld = temp;
 		}
 
-		if ((y = std::abs(y)) <= 1) {
-			if (y > 1) y = 1;
+		y = std::abs(y);
+		if (y < 1) {
 			pcl::PassThrough<PointT> pass;
 			pass.setInputCloud (ptcld);
 			pass.setFilterFieldName ("y");
 			pass.setFilterLimits (-y, y);
+			// Filter between -y and y. Then store it back to ptcld
 			pass.filter (*temp);
 			ptcld = temp;
 		}
 
-		if ((z = std::abs(z)) <= 1) {
-			if (z > 1) z = 1;
-			double d = (maxDepth - minDepth)/2; // = 4;
+
+		z = std::abs(z);
+		if (z < 1) {
+			// The max/min Depth parameters determine the possible values of depth
+			double d = (maxDepth - minDepth);
+			//the new min/max (after trimming) are calculated according to 'z'
 			double minTrim = minDepth + d*(1.0f-z), maxTrim = minDepth + d*z;
 			pcl::PassThrough<PointT> pass;
 			std::cout << " \t trimming z in " << minTrim << ", " << maxTrim;
 			pass.setInputCloud (ptcld);
 			pass.setFilterFieldName ("z");
 			pass.setFilterLimits (minTrim, maxTrim);
+			// Filter between min and max. Then store it back to ptcld
 			pass.filter (*temp);
 			ptcld = temp;
 		}
@@ -633,8 +645,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// Adapting the values to the ROS convention:
 		// "Coordinate systems in ROS are always in 3D, and are right-handed, with X
 		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
-//		tf_result.getOrigin()[2] = 0-tf_result.getOrigin()[2];
-		rotate_tf(tf_result, kinectRoll, kinectPitch, kinectYaw);
+		// NOTE: Point Clouds have ALWAYS Y to represent up and Z for depth!!
+		
+		multiply_tf(tf_result, fixed_camera_transform);
 		
 		round_near_zero_values(tf_result, measureAccuracy);
 	}
@@ -658,11 +671,23 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				tf_result.getOrigin()[i] = 0;
 			}
 		}
+		
+		/*
+		 * Dirty trick to ignore
+		 * errors from the algorithm in yaw calculations:
+		
+		double R, P, Y; tf_result.getBasis().getRPY(R, P, Y);
+		tf::Transform tf;
+		generate_tf(tf, 0, P, 0);
+		tf_result = tf;
+		*/
+		
 	}
 
 	//=============================================================================
 	
 	void odometryComm::printTransform(tf::Transform &newTF){
+		/*// This is ommitted as the whole matrix is not needed anymore
 		  for (int i=0; i<3; i++) {
 			  tf::Vector3 tmp = newTF.getBasis()[i];
 			  std::cout << " \t " << tmp.x();
@@ -673,6 +698,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				  std::cout << " \t ";
 			  std::cout << " \t " << tmp.z() << std::endl;
 		  }
+		  */
 		  std::cout << "(x, y, z) = \t " << newTF.getOrigin().x() << " \t " << newTF.getOrigin().y() << " \t " << newTF.getOrigin().z() << std::endl;
 		  std::cout << "(R, P, Y :: W) normalized = \r\n\t\t " << newTF.getRotation().getX() << " \t " << newTF.getRotation().getY() << " \t " << newTF.getRotation().getZ() << " \t ++ " << newTF.getRotation().getW() << std::endl;
 		  double R, P, Y; newTF.getBasis().getRPY(R, P, Y);
@@ -696,16 +722,12 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	//=============================================================================
 
 	bool odometryComm::generate_tf(tf::Transform &tf, double roll, double pitch, double yaw) {
-		if (&tf==0)
-			tf = tf::Transform::getIdentity();
+		tf = tf::Transform::getIdentity();
 		
 		double x=roll, y=pitch, z=yaw;
-		tf::Quaternion newRotation(0, 0, 0, 1); // XYZW constructor
-		//		newRotation.setEuler(0, 90, 0);
-				// The RPY rotation is set in radians
-				//but the getted value is the sin of the angle
+		tf::Quaternion newRotation(0, 0, 0, 1); // XYZW quaternion constructor
 		newRotation.setRPY(x, y, z);
-		std::cout << "setRotation(" << x << ", " << y << ", " << z << ")" << std::endl;
+//		std::cout << "setRotation(" << x << ", " << y << ", " << z << ")" << std::endl;
 
 		tf::Vector3 newOrigin(0, 0, 0);
 
@@ -715,23 +737,47 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		return true;
 	}
 
+	//=============================================================================
+
+	bool odometryComm::generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw) {
+		tf::Transform tf = tf::Transform::getIdentity();
+		Eigen::Matrix4f *aux_mat = new Eigen::Matrix4f();
+		mat = *aux_mat;
+		
+		generate_tf(tf, roll, pitch, yaw);
+		
+		pcl_ros::transformAsMatrix(tf, mat);
+		
+		return true;
+	}
+
+	//=============================================================================
+
 	void odometryComm::rotate_tf(tf::Transform &original_tf, double roll, double pitch, double yaw) {
+		// Starts by creating a fixedTF with the rotations. Then rotates the original tf
 		tf::Transform fixedTF = tf::Transform::getIdentity();
 		generate_tf(fixedTF, roll, pitch, yaw);
 
-		rotate_tf(original_tf, fixedTF);
+		multiply_tf(original_tf, fixedTF);
+		std::cout << "***initial camera fixed tf:" << std::endl; printTransform(original_tf);
 	}
 
 	
-	void odometryComm::rotate_tf(tf::Transform &original_tf, tf::Transform &fixedTF) {
-		tf::Transform resultTF1 = fixedTF * original_tf; // This works for rotation
-		tf::Transform resultTF2 = resultTF1 * (fixedTF.inverse());
+	//=============================================================================
+
+	void odometryComm::multiply_tf(tf::Transform &original_tf, tf::Transform &fixedTF) {
+		// The product doesn't seem to be altered by the order:
+		tf::Transform resultTF1 = original_tf * fixedTF; // == fixedTF * original_TF
+
+//NOTE: This method was created just in case that the rotation and the position
+//needed to be applied in a special way but the position (X,Y,Z) is always added and
+//the rotation (R, P, Y) is accumulated too.
+
+		
 //		std::cout << "***original_tf:" << std::endl; printTransform(original_tf);
-//		std::cout << "And this is after the operation:" << std::endl;
-		std::cout << "***fixedTF:" << std::endl; printTransform(fixedTF);
-//		std::cout << "***resultTF1:" << std::endl; printTransform(resultTF1);
-//		std::cout << "***resultTF2:" << std::endl; printTransform(resultTF2);
-		original_tf = resultTF2;
+//		std::cout << "***fixedTF:" << std::endl; printTransform(fixedTF);
+//		std::cout << "***resultTF1 (after calculations):" << std::endl; printTransform(resultTF1);
+		original_tf = resultTF1;
 	}
 
 	
@@ -740,8 +786,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	//////////////////////////////////////////////////////
 	void odometryComm::broadcastTransform(tf::Transform &newTF, std::string tfChannel, std::string tfParent){
 	  tf::TransformBroadcaster br;
-	  std::cout << "I'm broadcasting one tf at " << ros::Time::now() << std::endl;
-	  std::cout << "...with the next values: " << std::endl;
+	  std::cout << "Broadcasting TF \"" << tfChannel << "\" at time: " << ros::Time::now() << std::endl;
 	  printTransform(newTF);
 	  br.sendTransform(tf::StampedTransform(newTF, ros::Time::now(), tfParent, tfChannel));
 	}
@@ -809,7 +854,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	
 	
 	//////////////////////////////////////////////////////
-	///////// CONVERTERS FROM EIGEN MATRICES /////////////
+	///////// CONVERTERS FROM TRANSFORMATIONS ////////////
 	//////////////////////////////////////////////////////
 	nav_msgs::Odometry odometryComm::transformToOdometry(tf::Transform tMatrix, ros::Time stamp, std::string frameID, std::string childID) {
 		nav_msgs::Odometry odom_msg_output;
@@ -892,11 +937,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				if (euclideanDistance > 0)
 					icp.setEuclideanFitnessEpsilon (euclideanDistance);
 				else
-					printf("euclideanDistance is: %LE\r\n", icp.getEuclideanFitnessEpsilon());
+					printf("euclideanDistance is: %E\r\n", icp.getEuclideanFitnessEpsilon());
 				if (maxRansacIterations != 0)
 					icp.setRANSACIterations (maxRansacIterations);
 				else
-					printf("maxRansacIterations is: %u\r\n", icp.getRANSACIterations());
+					printf("maxRansacIterations is: %E\r\n", icp.getRANSACIterations());
 				if (ransacInlierThreshold > 0)
 					icp.setRANSACOutlierRejectionThreshold (ransacInlierThreshold);
 				else
@@ -905,16 +950,23 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			
 			// Run the calculations (returns nothing but copies in "cloud_aligned" the
 			//input PC (cloud_initial) transformed accordingly to the result
-			PointCloudT cloud_aligned;
+			PointCloudT cloud_aligned; // The aligned cloud will be ignored
+			
+			
+			// Trying 3 ways version
+			Eigen::Matrix4f final_result, guess;
+			double final_score = 1;
+
+
+			generate_tf(guess, 0, 0, 0);
+			generate_tf(guess, 0, -0.2, 0);
+			generate_tf(guess, 0, 0.2, 0);
+			
 			icp.align(cloud_aligned);
+			
 //			icp.align(cloud_aligned, const Eigen::Matrix4f &guess); // If there's any guess
 			cloud_aligned.header.stamp = ros::Time(0);
-			pcl_pub_aligned.publish(cloud_aligned);
-			pcl_pub_initial.publish(cloud_initial);
-			pcl_pub_final.publish(cloud_final);
 
-			// The PC produced by the algorithm is stored // Right now I prefer not to modify cloud_final
-//				*cloud_final = cloud_aligned;
 			if (icp.hasConverged()) {
 				std::cout << "has converged with score: " << icp.getFitnessScore() << " after " << (ros::Time::now()-ini_time) << " for " << cloud_aligned.points.size() << " points." << std::endl;
 			}
@@ -923,6 +975,26 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		return icp.getFinalTransformation();
 	}
 	
+	
+	// Alternative transformation estimator with "SVD"-based algorithm
+	Eigen::Matrix4f odometryComm::estimateTransformation(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final) {
+		if (cloud_final == 0 || cloud_initial == 0) {
+			ROS_INFO("Empty clouds received; returning!"); //ROS_WARN
+			return Eigen::Matrix4f(0,0);
+		}
+		
+		
+//		pcl::registration::TransformationEstimation<PointT, PointT> MyEstimation;
+		pcl::registration::TransformationEstimationSVD<PointT, PointT> svd;
+		
+		//*****************************
+		// ** Main processing
+		//*****************************
+		Eigen::Matrix4f transformationResult;
+		svd.estimateRigidTransformation(*cloud_initial, *cloud_final, transformationResult);
+
+		return transformationResult;
+	}
 	
 
 	
@@ -970,7 +1042,12 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		previous=PointCloudT::Ptr(new PointCloudT);
 		globalTF = tf::Transform::getIdentity();
 		lastRelativeTF =  tf::Transform::getIdentity();
-		return fill_in_answer(res.answer);
+		
+		// This can be done or not as it's not a meassure but a config
+		  fixed_camera_transform = tf::Transform::getIdentity();
+		  rotate_tf(fixed_camera_transform, kinectRoll, kinectPitch, kinectYaw);
+	
+		  return fill_in_answer(res.answer);
 	}
 	
 
@@ -986,7 +1063,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	///////////////////////////////////////////////////////////
 	void odometryComm::PCL_callback(const PointCloudT::ConstPtr & cloud_msg) {
 		boost::mutex::scoped_lock lock(callback_mutex); // Lock
-		PointCloudT::Ptr pointCloud1_out(new PointCloudT);
 		
 		// It is necessary to copy everything in a new variable as the original
 		//cloud is constant.
@@ -1002,7 +1078,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	//////////////////////////////////////////////////////////
 	void odometryComm::STR_callback(const std_msgs::String::ConstPtr & nextTopic) {
 		boost::mutex::scoped_lock lock(callback_mutex); // Lock
-		PointCloudT::Ptr pointCloud1_out(new PointCloudT);
 		
 		ROS_INFO("Requested cloud at %f.", static_cast<double>(ros::Time::now().toSec()));
 
@@ -1035,21 +1110,20 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		}
 		
 		ROS_INFO("Got cloud with timestamp %f.", static_cast<double>(pointCloud1_aux->header.stamp.toSec()));
-		PointCloudT::Ptr pointCloud1_out(new PointCloudT);
+		PointCloudT::Ptr pointCloud1_last(new PointCloudT);
 
-		// The point cloud is filtered before any further checking.
-		apply_filters(pointCloud1_aux, pointCloud1_out);
-// (( This would look pretty overloading the PCL as pointCloud1_out.apply_filters(...)
-//but it's definitely not worth it. ))
+		// The point cloud is filtered at the beginning
+		apply_filters(pointCloud1_aux, pointCloud1_last);
 
-		pointCloud1_aux=pointCloud1_out;
+		pointCloud1_aux=pointCloud1_last;
 
-		if (pointCloud1_out->points.size() < 10) {
+		// If no valid points after filtering, the PC is not valid itself
+		if (pointCloud1_last->points.size() < 10) {
 			ROS_INFO("Not enough points after the filtering. Need better more data.");
 			return; // Nothing can be done without points
 		}
 		// Timestamp set to 0 for RViz not to go crazy about it
-		pointCloud1_out->header.stamp = ros::Time(0);
+		pointCloud1_last->header.stamp = ros::Time(0);
 		
 		
 		
@@ -1066,8 +1140,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//(already filtered) as previous and the callback ends
 		if (previous == 0 || previous->points.size() < 1) {
 			ROS_INFO("No previous PointCloud. First PointCloud read.");
-			trimPreviousCloud(pointCloud1_out, cloud_trim_x, cloud_trim_y, cloud_trim_z);
-			previous = pointCloud1_out;
+			trimPreviousCloud(pointCloud1_last, cloud_trim_x, cloud_trim_y, cloud_trim_z);
+			previous = pointCloud1_last;
 			// Status waiting
 			setOdomStatus(WAITING);
 			return;
@@ -1075,59 +1149,64 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				
 		
 		// Actual processing
-		Eigen::Matrix4f tf_result = process2CloudsICP(previous, pointCloud1_out);
+//		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last);
+		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
 		
-		
-		tf::Transform transform_result = eigenToTransform(tf_result);
+		tf::Transform tf_result = eigenToTransform(tf_matrix_result);
 		
 		
 		// In case it is needed to make any changes in the transform
-		filter_resulting_TF(transform_result);
+		filter_resulting_TF(tf_result);
 		
 		// In case the lineal distance is bigger than the maximum, it's unlikely
 		//that the result is correct since either the maximum is false or the
 		//algorithm failed.
-		ROS_WARN("Raw distance/rotation: %f / %f", transformToDistance(transform_result), transformToRotation(transform_result));
-		if (transformToDistance(transform_result) > maxDistance) {
-			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance", transformToDistance(transform_result));
+		ROS_WARN("Raw distance/rotation: %f / %f", transformToDistance(tf_result), transformToRotation(tf_result));
+		if (transformToDistance(tf_result) > maxDistance) {
+			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance", transformToDistance(tf_result));
 			
 			// Status running
 			setOdomStatus(UNRELIABLE_RESULT);
 		}
 		else setOdomStatus(WAITING);
 
-		if (transformToDistance(transform_result)  == 0) {
+		if (transformToDistance(tf_result)  == 0) {
 			ROS_WARN("THE POSITION IN SPACE HASN'T CHANGED!!");
 		}
-		if (transformToRotation(transform_result)  == 0) {
+		if (transformToRotation(tf_result)  == 0) {
 			ROS_WARN("THE ORIENTATION HASN'T CHANGED!!");
 		}
-		if (transformToDistance(transform_result)  != 0 || transformToRotation(transform_result)  != 0) {
-			// ONLY IF THERE ARE CHANGES! then:
+		// ONLY IF THERE ARE CHANGES! (movement) then:
+		if (transformToDistance(tf_result)  != 0 || transformToRotation(tf_result)  != 0) {
+			// Calculate the new aligned cloud:
+			PointCloudT::Ptr pointCloud1_aligned(new PointCloudT);
+			pcl_ros::transformAsMatrix(tf_result, tf_matrix_result);
+			pcl::transformPointCloud (*previous, *pointCloud1_aligned, tf_matrix_result);
+
+			// Publish all the results
+			pcl_pub_initial.publish(previous);
+			pcl_pub_final.publish(pointCloud1_last);
+			pcl_pub_aligned.publish(pointCloud1_aligned);
+
+			trimPreviousCloud(pointCloud1_last, cloud_trim_x, cloud_trim_y, cloud_trim_z);
 			// The last PointCloud is stored as the previous one for the next call
-/*			pcl::PassThrough<PointT> pass;
-			pass.setInputCloud (pointCloud1_out);
-			pass.setFilterFieldName ("x");
-			pass.setFilterLimits (-0.6, 0.6);
-			pass.filter (*previous);
-*/
-			trimPreviousCloud(pointCloud1_out, cloud_trim_x, cloud_trim_y, cloud_trim_z);
-			previous = pointCloud1_out;
+			previous = pointCloud1_last;
+
+			// The "tf_matrix_result" transform is the last movement known relatively to the
+			//last position, the "globalTF" is the total accumulated position.
+			lastRelativeTF = tf_result;
+			globalTF = globalTF * tf_result;
+			
+			
+			// In the end, both known transforms are published both as transforms and
+			//odometry messages.
+			broadcastTransform(globalTF, "globalTF");
+			broadcastTransform(lastRelativeTF, "relativeTF");
+			
+			my_odometry::odom_answer newAnswer;
+			fill_in_answer(newAnswer);
+			odom_answer_publisher.publish(newAnswer);
 		}
-		// The "tf_result" transform is the last movement known relatively to the
-		//last position, the "globalTF" is the total accumulated position.
-		lastRelativeTF = transform_result;
-		globalTF = globalTF * transform_result;
-		
-		
-		// In the end, both known transforms are published both as transforms and
-		//odometry messages.
-		broadcastTransform(globalTF, "globalTF");
-		broadcastTransform(lastRelativeTF, "relativeTF");
-		
-		my_odometry::odom_answer newAnswer;
-		fill_in_answer(newAnswer);
-		odom_answer_publisher.publish(newAnswer);
 	}
 
 //=============================================================================

@@ -42,6 +42,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/flann/util/
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/flann/util/saving.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/flann/util/timer.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/geometry_msgs/Point.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/geometry_msgs/Point32.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/geometry_msgs/PointStamped.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/geometry_msgs/Pose.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/geometry_msgs/PoseStamped.h
@@ -111,6 +112,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/registration.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation_svd.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transforms.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/ros/conversions.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/ros/register_point_struct.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/pcl-1.5/pcl/sample_consensus/impl/ransac.hpp
@@ -129,6 +131,8 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/adverti
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/advertise_service_options.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/assert.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/builtin_message_traits.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/callback_queue.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/callback_queue_interface.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/common.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/console.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/duration.h
@@ -177,9 +181,12 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/types.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/wall_timer.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/ros/wall_timer_options.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/rosconsole/macros_generated.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/sensor_msgs/ChannelFloat32.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/sensor_msgs/Image.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/sensor_msgs/PointCloud.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/sensor_msgs/PointCloud2.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/sensor_msgs/PointField.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/std_msgs/Empty.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/std_msgs/Header.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/include/std_msgs/String.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/bullet/include/LinearMath/btMatrix3x3.h
@@ -199,10 +206,14 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/time_cache.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_broadcaster.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_datatypes.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_listener.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/msg_gen/cpp/include/tf/tfMessage.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf/srv_gen/cpp/include/tf/FrameGraph.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry/tf_conversions/include/tf_conversions/tf_eigen.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/cpp/include/tf2_msgs/TFMessage.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/impl/transforms.hpp
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/point_cloud.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/transforms.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /usr/include/eigen3/Eigen/Cholesky
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /usr/include/eigen3/Eigen/Core
 CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o: /usr/include/eigen3/Eigen/Eigen2Support
@@ -427,6 +438,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/flann/util/sam
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/flann/util/saving.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/flann/util/timer.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/geometry_msgs/Point.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/geometry_msgs/Point32.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/geometry_msgs/PointStamped.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/geometry_msgs/Pose.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/geometry_msgs/PoseStamped.h
@@ -496,6 +508,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/re
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/registration.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation_svd.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transforms.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/ros/conversions.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/ros/register_point_struct.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/pcl-1.5/pcl/sample_consensus/impl/ransac.hpp
@@ -514,6 +527,8 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/advertise_
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/advertise_service_options.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/assert.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/builtin_message_traits.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/callback_queue.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/callback_queue_interface.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/common.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/console.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/duration.h
@@ -562,9 +577,12 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/types.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/wall_timer.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/ros/wall_timer_options.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/rosconsole/macros_generated.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/sensor_msgs/ChannelFloat32.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/sensor_msgs/Image.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/sensor_msgs/PointCloud.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/sensor_msgs/PointCloud2.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/sensor_msgs/PointField.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/std_msgs/Empty.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/std_msgs/Header.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/include/std_msgs/String.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/bullet/include/LinearMath/btMatrix3x3.h
@@ -584,10 +602,14 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/inc
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/time_cache.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_broadcaster.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_datatypes.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_listener.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/msg_gen/cpp/include/tf/tfMessage.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf/srv_gen/cpp/include/tf/FrameGraph.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry/tf_conversions/include/tf_conversions/tf_eigen.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/cpp/include/tf2_msgs/TFMessage.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/impl/transforms.hpp
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/point_cloud.h
+CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/transforms.h
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /usr/include/eigen3/Eigen/Cholesky
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /usr/include/eigen3/Eigen/Core
 CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o: /usr/include/eigen3/Eigen/Eigen2Support

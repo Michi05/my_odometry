@@ -32,10 +32,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/r00t/ros_workspace/my_odometry
+CMAKE_SOURCE_DIR = /home/r00t/Dropbox/ros_workspace/my_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/r00t/ros_workspace/my_odometry/build
+CMAKE_BINARY_DIR = /home/r00t/Dropbox/ros_workspace/my_odometry/build
 
 # Utility rule file for tests.
 
@@ -57,6 +57,6 @@ CMakeFiles/tests.dir/clean:
 .PHONY : CMakeFiles/tests.dir/clean
 
 CMakeFiles/tests.dir/depend:
-	cd /home/r00t/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/r00t/Dropbox/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/r00t/Dropbox/ros_workspace/my_odometry /home/r00t/Dropbox/ros_workspace/my_odometry /home/r00t/Dropbox/ros_workspace/my_odometry/build /home/r00t/Dropbox/ros_workspace/my_odometry/build /home/r00t/Dropbox/ros_workspace/my_odometry/build/CMakeFiles/tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/tests.dir/depend
 

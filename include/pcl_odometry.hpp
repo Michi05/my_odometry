@@ -25,6 +25,10 @@
 #include <pcl/point_cloud.h>
 #include <pcl_ros/point_cloud.h> // (de)serialize ros messages directly
 #include <pcl/filters/filter.h>
+#include <pcl_ros/impl/transforms.hpp> // For transformAsMatrix
+// New Registration Tests
+#include <pcl/registration/transformation_estimation_svd.h>
+
 // May24
 #include <boost/thread.hpp>
 #include <string>
@@ -458,9 +462,12 @@ private:
 	   */
 	bool generate_tf(tf::Transform &tf, double roll, double pitch, double yaw);
 	
+	// TODO: Document: overload of the one above
+	bool generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw);
+	
 	/**
-	   * Rotates a calculated transform frame according to the passed values.
-	   * The resulting transform should  represent the same movement just from
+	   * Rotates a transform frame according to the passed values.
+	   * The resulting transform should represent the same movement just from
 	   * a different reference system.
 	   *   
 	   *   @param tf_result - the calculated transform to be rotated
@@ -471,14 +478,14 @@ private:
 	void rotate_tf(tf::Transform &tf_result, double roll, double pitch, double yaw);
 
 	/**
-	   * Rotates a calculated transform frame according to the fixed transform that
-	   * describes the relative position of the camera. The resulting transform should
+	   * Rotates a transform frame according to the fixed transform that
+	   * describes a relative position. The resulting transform should
 	   * represent the same movement just from a different reference system.
 	   *   
-	   *   @param tf_result - the calculated transform to be rotated
-	   *   @param fixedTF - the fixed transform describing the camera position
+	   *   @param tf_result - the transform to be rotated
+	   *   @param fixedTF - the fixed transform with the rotation to be applied
 	   */
-	void rotate_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
+	void multiply_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
 
 	  /**
 	   * Automatically prints all the data in a transform frame stored as a "tf Transform"
@@ -557,7 +564,15 @@ private:
 	   */
 	void matToRPY(Eigen::Matrix4f t, double& roll, double& pitch, double& yaw);
 
-	  /**
+
+	
+	
+	
+	//////////////////////////////////////////////////////
+	///////// CONVERTERS FROM TRANSFORMATIONS ////////////
+	//////////////////////////////////////////////////////
+
+	/**
 	   * Converts a transform frame 
 	   * into Odometry/transform frame/tfMessage
 	   *   
@@ -574,7 +589,7 @@ private:
 	nav_msgs::Odometry transformToOdometry(tf::Transform tMatrix, ros::Time stamp = ros::Time(0), std::string frameID = "my_odom_tf", std::string childID = "base_link");
 
 	  /**
-	   * Converts the transform frame stored as Matrix4f from the eigen library
+	   * Converts the transform frame stored as tf Transform
 	   * into Odometry/transform frame/tfMessage
 	   *   
 	   *   @param tMatrix - original tf matrix
@@ -627,7 +642,8 @@ private:
 	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final);
 	
 
-
+	// TODO: Document if it finally works
+	Eigen::Matrix4f estimateTransformation(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final);
 
 	
 	

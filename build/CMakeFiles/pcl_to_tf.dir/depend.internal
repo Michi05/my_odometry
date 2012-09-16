@@ -7,7 +7,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
  ../srv_gen/cpp/include/my_odometry/emptyRequest.h
  ../srv_gen/cpp/include/my_odometry/odom_update_srv.h
  ../srv_gen/cpp/include/my_odometry/statusMsg.h
- /home/r00t/ros_workspace/my_odometry/src/pcl_odometry.cpp
+ /home/r00t/Dropbox/ros_workspace/my_odometry/src/pcl_odometry.cpp
  /opt/ros/fuerte/include/XmlRpcDecl.h
  /opt/ros/fuerte/include/XmlRpcValue.h
  /opt/ros/fuerte/include/flann/algorithms/all_indices.h
@@ -43,6 +43,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
  /opt/ros/fuerte/include/flann/util/saving.h
  /opt/ros/fuerte/include/flann/util/timer.h
  /opt/ros/fuerte/include/geometry_msgs/Point.h
+ /opt/ros/fuerte/include/geometry_msgs/Point32.h
  /opt/ros/fuerte/include/geometry_msgs/PointStamped.h
  /opt/ros/fuerte/include/geometry_msgs/Pose.h
  /opt/ros/fuerte/include/geometry_msgs/PoseStamped.h
@@ -112,6 +113,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
  /opt/ros/fuerte/include/pcl-1.5/pcl/registration/registration.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation_svd.h
+ /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transforms.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/ros/conversions.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/ros/register_point_struct.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/sample_consensus/impl/ransac.hpp
@@ -130,6 +132,8 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
  /opt/ros/fuerte/include/ros/advertise_service_options.h
  /opt/ros/fuerte/include/ros/assert.h
  /opt/ros/fuerte/include/ros/builtin_message_traits.h
+ /opt/ros/fuerte/include/ros/callback_queue.h
+ /opt/ros/fuerte/include/ros/callback_queue_interface.h
  /opt/ros/fuerte/include/ros/common.h
  /opt/ros/fuerte/include/ros/console.h
  /opt/ros/fuerte/include/ros/duration.h
@@ -178,9 +182,12 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
  /opt/ros/fuerte/include/ros/wall_timer.h
  /opt/ros/fuerte/include/ros/wall_timer_options.h
  /opt/ros/fuerte/include/rosconsole/macros_generated.h
+ /opt/ros/fuerte/include/sensor_msgs/ChannelFloat32.h
  /opt/ros/fuerte/include/sensor_msgs/Image.h
+ /opt/ros/fuerte/include/sensor_msgs/PointCloud.h
  /opt/ros/fuerte/include/sensor_msgs/PointCloud2.h
  /opt/ros/fuerte/include/sensor_msgs/PointField.h
+ /opt/ros/fuerte/include/std_msgs/Empty.h
  /opt/ros/fuerte/include/std_msgs/Header.h
  /opt/ros/fuerte/include/std_msgs/String.h
  /opt/ros/fuerte/stacks/bullet/include/LinearMath/btMatrix3x3.h
@@ -200,10 +207,14 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
  /opt/ros/fuerte/stacks/geometry/tf/include/tf/time_cache.h
  /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_broadcaster.h
  /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_datatypes.h
+ /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_listener.h
  /opt/ros/fuerte/stacks/geometry/tf/msg_gen/cpp/include/tf/tfMessage.h
+ /opt/ros/fuerte/stacks/geometry/tf/srv_gen/cpp/include/tf/FrameGraph.h
  /opt/ros/fuerte/stacks/geometry/tf_conversions/include/tf_conversions/tf_eigen.h
  /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/cpp/include/tf2_msgs/TFMessage.h
+ /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/impl/transforms.hpp
  /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/point_cloud.h
+ /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/transforms.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Eigen2Support
@@ -392,7 +403,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
  ../srv_gen/cpp/include/my_odometry/emptyRequest.h
  ../srv_gen/cpp/include/my_odometry/odom_update_srv.h
  ../srv_gen/cpp/include/my_odometry/statusMsg.h
- /home/r00t/ros_workspace/my_odometry/src/pcl_to_tf.cpp
+ /home/r00t/Dropbox/ros_workspace/my_odometry/src/pcl_to_tf.cpp
  /opt/ros/fuerte/include/XmlRpcDecl.h
  /opt/ros/fuerte/include/XmlRpcValue.h
  /opt/ros/fuerte/include/flann/algorithms/all_indices.h
@@ -428,6 +439,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
  /opt/ros/fuerte/include/flann/util/saving.h
  /opt/ros/fuerte/include/flann/util/timer.h
  /opt/ros/fuerte/include/geometry_msgs/Point.h
+ /opt/ros/fuerte/include/geometry_msgs/Point32.h
  /opt/ros/fuerte/include/geometry_msgs/PointStamped.h
  /opt/ros/fuerte/include/geometry_msgs/Pose.h
  /opt/ros/fuerte/include/geometry_msgs/PoseStamped.h
@@ -497,6 +509,7 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
  /opt/ros/fuerte/include/pcl-1.5/pcl/registration/registration.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transformation_estimation_svd.h
+ /opt/ros/fuerte/include/pcl-1.5/pcl/registration/transforms.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/ros/conversions.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/ros/register_point_struct.h
  /opt/ros/fuerte/include/pcl-1.5/pcl/sample_consensus/impl/ransac.hpp
@@ -515,6 +528,8 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
  /opt/ros/fuerte/include/ros/advertise_service_options.h
  /opt/ros/fuerte/include/ros/assert.h
  /opt/ros/fuerte/include/ros/builtin_message_traits.h
+ /opt/ros/fuerte/include/ros/callback_queue.h
+ /opt/ros/fuerte/include/ros/callback_queue_interface.h
  /opt/ros/fuerte/include/ros/common.h
  /opt/ros/fuerte/include/ros/console.h
  /opt/ros/fuerte/include/ros/duration.h
@@ -563,9 +578,12 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
  /opt/ros/fuerte/include/ros/wall_timer.h
  /opt/ros/fuerte/include/ros/wall_timer_options.h
  /opt/ros/fuerte/include/rosconsole/macros_generated.h
+ /opt/ros/fuerte/include/sensor_msgs/ChannelFloat32.h
  /opt/ros/fuerte/include/sensor_msgs/Image.h
+ /opt/ros/fuerte/include/sensor_msgs/PointCloud.h
  /opt/ros/fuerte/include/sensor_msgs/PointCloud2.h
  /opt/ros/fuerte/include/sensor_msgs/PointField.h
+ /opt/ros/fuerte/include/std_msgs/Empty.h
  /opt/ros/fuerte/include/std_msgs/Header.h
  /opt/ros/fuerte/include/std_msgs/String.h
  /opt/ros/fuerte/stacks/bullet/include/LinearMath/btMatrix3x3.h
@@ -585,10 +603,14 @@ CMakeFiles/pcl_to_tf.dir/src/pcl_to_tf.o
  /opt/ros/fuerte/stacks/geometry/tf/include/tf/time_cache.h
  /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_broadcaster.h
  /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_datatypes.h
+ /opt/ros/fuerte/stacks/geometry/tf/include/tf/transform_listener.h
  /opt/ros/fuerte/stacks/geometry/tf/msg_gen/cpp/include/tf/tfMessage.h
+ /opt/ros/fuerte/stacks/geometry/tf/srv_gen/cpp/include/tf/FrameGraph.h
  /opt/ros/fuerte/stacks/geometry/tf_conversions/include/tf_conversions/tf_eigen.h
  /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/cpp/include/tf2_msgs/TFMessage.h
+ /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/impl/transforms.hpp
  /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/point_cloud.h
+ /opt/ros/fuerte/stacks/perception_pcl/pcl_ros/include/pcl_ros/transforms.h
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Eigen2Support

@@ -32,10 +32,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/r00t/ros_workspace/my_odometry
+CMAKE_SOURCE_DIR = /home/r00t/Dropbox/ros_workspace/my_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/r00t/ros_workspace/my_odometry/build
+CMAKE_BINARY_DIR = /home/r00t/Dropbox/ros_workspace/my_odometry/build
 
 # Utility rule file for ROSBUILD_genmsg_lisp.
 
@@ -106,9 +106,9 @@ CMakeFiles/ROSBUILD_genmsg_lisp: ../msg_gen/lisp/_package_odom_answer.lisp
 ../msg_gen/lisp/odom_answer.lisp: /opt/ros/fuerte/stacks/geometry/tf/srv_gen/generated
 ../msg_gen/lisp/odom_answer.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/msg_gen/generated
 ../msg_gen/lisp/odom_answer.lisp: /opt/ros/fuerte/stacks/geometry_experimental/tf2_msgs/srv_gen/generated
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/r00t/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/r00t/Dropbox/ros_workspace/my_odometry/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating ../msg_gen/lisp/odom_answer.lisp, ../msg_gen/lisp/_package.lisp, ../msg_gen/lisp/_package_odom_answer.lisp"
-	/opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py /home/r00t/ros_workspace/my_odometry/msg/odom_answer.msg
+	/opt/ros/fuerte/share/roslisp/rosbuild/scripts/genmsg_lisp.py /home/r00t/Dropbox/ros_workspace/my_odometry/msg/odom_answer.msg
 
 ../msg_gen/lisp/_package.lisp: ../msg_gen/lisp/odom_answer.lisp
 
@@ -130,6 +130,6 @@ CMakeFiles/ROSBUILD_genmsg_lisp.dir/clean:
 .PHONY : CMakeFiles/ROSBUILD_genmsg_lisp.dir/clean
 
 CMakeFiles/ROSBUILD_genmsg_lisp.dir/depend:
-	cd /home/r00t/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build /home/r00t/ros_workspace/my_odometry/build/CMakeFiles/ROSBUILD_genmsg_lisp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/r00t/Dropbox/ros_workspace/my_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/r00t/Dropbox/ros_workspace/my_odometry /home/r00t/Dropbox/ros_workspace/my_odometry /home/r00t/Dropbox/ros_workspace/my_odometry/build /home/r00t/Dropbox/ros_workspace/my_odometry/build /home/r00t/Dropbox/ros_workspace/my_odometry/build/CMakeFiles/ROSBUILD_genmsg_lisp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ROSBUILD_genmsg_lisp.dir/depend
 
