@@ -7,9 +7,9 @@ FILE(REMOVE_RECURSE
   "../srv_gen"
   "CMakeFiles/ROSBUILD_gensrv_py"
   "../src/my_odometry/srv/__init__.py"
+  "../src/my_odometry/srv/_emptyRequest.py"
   "../src/my_odometry/srv/_statusMsg.py"
   "../src/my_odometry/srv/_odom_update_srv.py"
-  "../src/my_odometry/srv/_emptyRequest.py"
 )
 
 # Per-language clean rules from dependency scanning.

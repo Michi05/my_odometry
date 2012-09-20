@@ -33,6 +33,7 @@ const char   odometryComm::PARAM_KEY_ICP_EPSILON[] =    "icp_epsilon";
 const char   odometryComm::PARAM_KEY_ICP_EUCLIDEAN_DISTANCE[] =    "icp_euclidean_distance";
 const char   odometryComm::PARAM_KEY_ICP_RANSAC_ITERATIONS[] =    "icp_ransac_iterations";
 const char   odometryComm::PARAM_KEY_ICP_RANSAC_THRESHOLD[] =    "icp_ransac_threshold";
+const char   odometryComm::PARAM_KEY_ICP_SCORE[] =    "icp_min_score";
 
 const char   odometryComm::PARAM_KEY_CLOUD_TRIM_X[] =    "cloud_trim_x";
 const char   odometryComm::PARAM_KEY_CLOUD_TRIM_Y[] =    "cloud_trim_y";
@@ -77,6 +78,7 @@ const double   odometryComm::PARAM_DEFAULT_ICP_EPSILON =  0.000005;
 const double   odometryComm::PARAM_DEFAULT_ICP_EUCLIDEAN_DISTANCE =  0;
 const int   odometryComm::PARAM_DEFAULT_ICP_RANSAC_ITERATIONS =  0;
 const double   odometryComm::PARAM_DEFAULT_ICP_RANSAC_THRESHOLD =  0;
+const double   odometryComm::PARAM_DEFAULT_ICP_SCORE =  0.02;
 
 const double odometryComm::PARAM_DEFAULT_CLOUD_TRIM_X = 0.85;
 const double odometryComm::PARAM_DEFAULT_CLOUD_TRIM_Y = 0.9;
@@ -185,6 +187,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.param(PARAM_KEY_ICP_EUCLIDEAN_DISTANCE, euclideanDistance, PARAM_DEFAULT_ICP_EUCLIDEAN_DISTANCE);
 		    nodeHandlePrivate.param(PARAM_KEY_ICP_RANSAC_ITERATIONS,    maxRansacIterations, PARAM_DEFAULT_ICP_RANSAC_ITERATIONS);
 		    nodeHandlePrivate.param(PARAM_KEY_ICP_RANSAC_THRESHOLD, ransacInlierThreshold, PARAM_DEFAULT_ICP_RANSAC_THRESHOLD);
+		    nodeHandlePrivate.param(PARAM_KEY_ICP_SCORE, ICPMinScore, PARAM_DEFAULT_ICP_SCORE);
 
 		    nodeHandlePrivate.param(PARAM_KEY_CLOUD_TRIM_X, cloud_trim_x, PARAM_DEFAULT_CLOUD_TRIM_X);
 		    nodeHandlePrivate.param(PARAM_KEY_CLOUD_TRIM_Y, cloud_trim_y, PARAM_DEFAULT_CLOUD_TRIM_Y);
@@ -232,6 +235,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.setParam(PARAM_KEY_ICP_EUCLIDEAN_DISTANCE, euclideanDistance);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ICP_RANSAC_ITERATIONS,    maxRansacIterations);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ICP_RANSAC_THRESHOLD, ransacInlierThreshold);
+		    nodeHandlePrivate.setParam(PARAM_KEY_ICP_SCORE, ICPMinScore);
 
 		    nodeHandlePrivate.setParam(PARAM_KEY_CLOUD_TRIM_X, cloud_trim_x);
 		    nodeHandlePrivate.setParam(PARAM_KEY_CLOUD_TRIM_Y, cloud_trim_y);
@@ -331,6 +335,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  // The fixed camera tf needs to be initialized according to rotations
 		  fixed_camera_transform = tf::Transform::getIdentity();
 		  rotate_tf(fixed_camera_transform, kinectRoll, kinectPitch, kinectYaw);
+		  std::cout << "***initial camera fixed tf:" << std::endl; printTransform(fixed_camera_transform);
 
 			// Initialise status (no error and not-yet waiting for data)
 		  setOdomStatus(INITIALIZED);
@@ -433,6 +438,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  printf("    _%s:=%E\n",
 				  PARAM_KEY_ICP_RANSAC_THRESHOLD,
 				  ransacInlierThreshold);
+		  printf("    _%s:=%E\n",
+				  PARAM_KEY_ICP_SCORE,
+				  ICPMinScore);
 
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_CLOUD_TRIM_X,
@@ -623,7 +631,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			//the new min/max (after trimming) are calculated according to 'z'
 			double minTrim = minDepth + d*(1.0f-z), maxTrim = minDepth + d*z;
 			pcl::PassThrough<PointT> pass;
-			std::cout << " \t trimming z in " << minTrim << ", " << maxTrim;
+			std::cout << " \t trimming z in " << minTrim << ", " << maxTrim << std::endl << std::endl;
 			pass.setInputCloud (ptcld);
 			pass.setFilterFieldName ("z");
 			pass.setFilterLimits (minTrim, maxTrim);
@@ -634,21 +642,57 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 
 	//=============================================================================
+
 	double odometryComm::round(double value, int noDecimals) {
 		return floor(value*pow(10, noDecimals) + 0.5) / pow(10, noDecimals);
 	}
 
 	//=============================================================================
+
+	void odometryComm::applyRestrictions(tf::Transform &tf_input) {
+		/* TODO: 
+		 * Dirty trick that should be ignored
+		 * errors from the algorithm in yaw calculations:
+		*/
+		double R, P, Y;			tf_input.getBasis().getRPY(R, P, Y);
+//		tf::Transform tf;		generate_tf(tf, R/10.0, P, Y/10.0);
+		tf::Transform tf;		generate_tf(tf, R, P, Y);
+		tf.setOrigin(tf_input.getOrigin());
+		tf_input = tf;
+	}
+
+	void odometryComm::changeCoordinates(tf::Transform &tf) {
+		// Adapting the values to the ROS convention:
+		// "3D coordinate systems in ROS are always right-handed, with X
+		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
+		// But (CAUTION!) Point Clouds have ALWAYS Y to represent up and Z for depth,
+		//which is Forward! So the change is: (X, Y, Z)_cloud == (Z_cloud, X_cloud, Y_cloud)_transform
+		
+		// The initial RPY and XYZ values are stored firstly
+		double R, P, Y;			tf.getBasis().getRPY(R, P, Y);
+		btVector3 origin(tf.getOrigin()[2], tf.getOrigin()[0], tf.getOrigin()[1]);
+		// Finally they are stored in 'tf' 
+		generate_tf(tf, P, Y, R);
+		tf.setOrigin(origin);
+	}
+
+	//=============================================================================
 	void odometryComm::filter_resulting_TF(tf::Transform &tf_result) {
+		// A first rounding is needed in order to avoid the noise
+		//(a 0.00001 from the camera must be physical error but
+		//0.001 after transformation is not so clear)
 		round_near_zero_values(tf_result, measureAccuracy);
 		
-		// Adapting the values to the ROS convention:
-		// "Coordinate systems in ROS are always in 3D, and are right-handed, with X
-		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
-		// NOTE: Point Clouds have ALWAYS Y to represent up and Z for depth!!
+		// The known tf is the movement of the camera.
+		//The robot-relative tf is the needed one.
+		get_robot_relative_tf(tf_result, fixed_camera_transform);
 		
-		multiply_tf(tf_result, fixed_camera_transform);
-		
+		// This filter removes impossible calculations (like the
+		//robot seemly flying or so)
+		applyRestrictions(tf_result);
+
+		// The last rounding can be removed but it's useful for
+		//removing residual errors because of the maths
 		round_near_zero_values(tf_result, measureAccuracy);
 	}
 
@@ -671,17 +715,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				tf_result.getOrigin()[i] = 0;
 			}
 		}
-		
-		/*
-		 * Dirty trick to ignore
-		 * errors from the algorithm in yaw calculations:
-		
-		double R, P, Y; tf_result.getBasis().getRPY(R, P, Y);
-		tf::Transform tf;
-		generate_tf(tf, 0, P, 0);
-		tf_result = tf;
-		*/
-		
 	}
 
 	//=============================================================================
@@ -724,15 +757,12 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	bool odometryComm::generate_tf(tf::Transform &tf, double roll, double pitch, double yaw) {
 		tf = tf::Transform::getIdentity();
 		
-		double x=roll, y=pitch, z=yaw;
 		tf::Quaternion newRotation(0, 0, 0, 1); // XYZW quaternion constructor
-		newRotation.setRPY(x, y, z);
+		newRotation.setRPY(roll, pitch, yaw);
 //		std::cout << "setRotation(" << x << ", " << y << ", " << z << ")" << std::endl;
 
-		tf::Vector3 newOrigin(0, 0, 0);
-
 		tf.setRotation(newRotation);
-		tf.setOrigin(newOrigin);
+		tf.setOrigin(tf::Vector3(0, 0, 0));
 
 		return true;
 	}
@@ -741,10 +771,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 	bool odometryComm::generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw) {
 		tf::Transform tf = tf::Transform::getIdentity();
-		Eigen::Matrix4f *aux_mat = new Eigen::Matrix4f();
-		mat = *aux_mat;
-		
 		generate_tf(tf, roll, pitch, yaw);
+		
+		mat = *(new Eigen::Matrix4f());
 		
 		pcl_ros::transformAsMatrix(tf, mat);
 		
@@ -758,25 +787,28 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		tf::Transform fixedTF = tf::Transform::getIdentity();
 		generate_tf(fixedTF, roll, pitch, yaw);
 
-		multiply_tf(original_tf, fixedTF);
-		std::cout << "***initial camera fixed tf:" << std::endl; printTransform(original_tf);
+		original_tf.mult(original_tf, fixedTF);
 	}
 
 	
 	//=============================================================================
 
-	void odometryComm::multiply_tf(tf::Transform &original_tf, tf::Transform &fixedTF) {
-		// The product doesn't seem to be altered by the order:
-		tf::Transform resultTF1 = original_tf * fixedTF; // == fixedTF * original_TF
+	void odometryComm::get_robot_relative_tf(tf::Transform &original_tf, tf::Transform &fixedTF) {
+		// (( Remember: matrices are asociative, but not conmutative ))
 
-//NOTE: This method was created just in case that the rotation and the position
-//needed to be applied in a special way but the position (X,Y,Z) is always added and
-//the rotation (R, P, Y) is accumulated too.
+		tf::Transform resultTF1;
+		// La posición FIJA de la cámara es con respecto a cero (el robot)
+		//el movimiento estimado es el de la cámara
+		//el movimiento compuesto con la posición de la cámara es la nueva posición de la cámara
+		//la nueva posición de la cámara por la inversa de la posición FIJA de la cámara es la
+		//posición del robot, que no cambió su posición relativa
+		std::cout << "***original_tf:" << std::endl; printTransform(original_tf);
 
-		
-//		std::cout << "***original_tf:" << std::endl; printTransform(original_tf);
-//		std::cout << "***fixedTF:" << std::endl; printTransform(fixedTF);
-//		std::cout << "***resultTF1 (after calculations):" << std::endl; printTransform(resultTF1);
+//		resultTF1 = fixedTF.inverseTimes(original_tf) * fixedTF; // == fixedTF * original_TF
+
+		resultTF1 = fixedTF * original_tf * fixedTF.inverse(); // == fixedTF * original_TF
+		std::cout << "***resultTF3:" << std::endl; printTransform(resultTF1);
+
 		original_tf = resultTF1;
 	}
 
@@ -808,7 +840,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	             tMatrix(1,0),tMatrix(1,1),tMatrix(1,2),
 	             tMatrix(2,0),tMatrix(2,1),tMatrix(2,2));
 	  btTransform ret;
-	  ret.setOrigin(btVector3(tMatrix(2,3),tMatrix(1,3),tMatrix(0,3)));
+	  ret.setOrigin(btVector3(tMatrix(0,3),tMatrix(1,3),tMatrix(2,3)));
 	  ret.setBasis(btm);
 	  return ret;
 	}
@@ -887,13 +919,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// Translation data
 		tf2_msg_output.transform.translation.x = tMatrix.getOrigin().getX();
 		tf2_msg_output.transform.translation.y = tMatrix.getOrigin().getY();
-		tf2_msg_output.transform.translation.z = tMatrix.getOrigin().getZ(); // This is the high in rviz but not for me
+		tf2_msg_output.transform.translation.z = tMatrix.getOrigin().getZ();
 
 		// Rotation data
 		tf2_msg_output.transform.rotation.x = tMatrix.getRotation().getX();
 		tf2_msg_output.transform.rotation.y = tMatrix.getRotation().getY();
 		tf2_msg_output.transform.rotation.z = tMatrix.getRotation().getZ();
 	//	odom_msg_output.pose.pose.orientation.w = tMatrix.getRotation().getW();;
+		// TODO: check this again; I don't trust it
 
 		tfMessage newTFMessage;
 		newTFMessage.transforms.push_back(tf2_msg_output);
@@ -909,14 +942,20 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	/////////////////////////////////////////////////////////
 	//////////// MAIN ALGORITHM PROCESSING //////////////////
 	/////////////////////////////////////////////////////////
-// Point Cloud main stuff
-	Eigen::Matrix4f odometryComm::process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final) {
+	Eigen::Matrix4f odometryComm::process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, double *final_score_out) {
+		// If no hint passed, an identity matrix is the hint.
+		Eigen::Matrix4f neutralHint = Eigen::Matrix4f::Identity();
+		return process2CloudsICP(cloud_initial, cloud_final, neutralHint, final_score_out);
+	}
+
+	Eigen::Matrix4f odometryComm::process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, Eigen::Matrix4f &hint, double *final_score_out) {
 		if (cloud_final == 0 || cloud_initial == 0) {
 			ROS_INFO("Empty clouds received; returning!"); //ROS_WARN
-			return Eigen::Matrix4f(0,0);
+			return Eigen::Matrix4f::Identity();
 		}
 
 		pcl::IterativeClosestPoint<PointT, PointT> icp;
+		PointCloudT cloud_aligned; // The final cloud though it will be ignored
 
 		//*****************************
 		// ** Main processing
@@ -948,15 +987,13 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 					printf("ransacInlierThreshold is: %E\r\n", icp.getRANSACOutlierRejectionThreshold());
 				std::cout << std::endl << std::endl;
 			
-			// Run the calculations (returns nothing but copies in "cloud_aligned" the
-			//input PC (cloud_initial) transformed accordingly to the result
-			PointCloudT cloud_aligned; // The aligned cloud will be ignored
-
 			
 // **********************************************************			
-// ************** Trying 3 ways version *********************
+// ************** Trying 3 hints version *********************
 // **********************************************************
 
+// Run the calculations (returns nothing but copies in "cloud_aligned" the
+//input PC (cloud_initial) transformed accordingly to the result
 // Method specification:			icp.align(cloud_aligned, const Eigen::Matrix4f &guess); // If there's any guess
 			
 			
@@ -968,35 +1005,85 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
 				final_score = icp.getFitnessScore();
 				final_result = icp.getFinalTransformation();
+				std::cout << "Score after first try is " << final_score << std::endl;
 			}
-			
+
 			// Guessing negative pitch:
-			generate_tf(guess, 0, -0.2, 0);
+			generate_tf(guess, 0, -0.1, 0);
 			icp.align(cloud_aligned, guess); // If there's any guess
 			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
+				std::cout << "Result improved with -pitch from " << final_score << " to " << icp.getFitnessScore() << std::endl;
 				final_score = icp.getFitnessScore();
 				final_result = icp.getFinalTransformation();
 			}
 			
 			// Guessing positive pitch:
-			generate_tf(guess, 0, 0.2, 0);
+			generate_tf(guess, 0, 0.1, 0);
 			icp.align(cloud_aligned, guess);
 			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
+				std::cout << "Result improved with +pitch from " << final_score << " to " << icp.getFitnessScore() << std::endl;
 				final_score = icp.getFitnessScore();
 				final_result = icp.getFinalTransformation();
 			}
 
 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			// Guessing with HINT
+			if (hint == Eigen::Matrix4f::Identity()) {
+				std::cout << "No hint received, creating one." << std::endl;
+				tf::Transform newTransf = eigenToTransform(final_result);
+				// TODO: el hint también debería poner a 0 "R y Y" (P en el convenio real)
+//				btVector3 origin(newTransf.getOrigin()[0]/5.0, newTransf.getOrigin()[1]/10.0, newTransf.getOrigin()[2]/2.0);
+				btVector3 origin(0, 0, 0);
+				newTransf.setOrigin(origin);
+				pcl_ros::transformAsMatrix(newTransf, hint);
+			}
+			else std::cout << "Using passed hint." << std::endl;
+			icp.align(cloud_aligned, hint); // If there's any guess
+			if (icp.hasConverged() && icp.getFitnessScore() < final_score) {
+				std::cout << "Result improved with hint00 from " << final_score << " to " << icp.getFitnessScore() << std::endl;
+				final_score = icp.getFitnessScore();
+				final_result = icp.getFinalTransformation();
+			}
+			std::cout << "Score after HINT00 is " << icp.getFitnessScore() << std::endl;
+			std::cout << std::flush;
+			
+			// NOTE: I REALLY would use the last correct estimation as a hint.
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			// Just in case the cloud_aligned is published
 			//is better to tag it as timestamp==0 to avoid problems
 			cloud_aligned.header.stamp = ros::Time(0);
 
 			
-			if (final_score < 1.0) {
-				std::cout << "has converged with score: " << final_score << " after " << (ros::Time::now()-ini_time) << " for " << cloud_aligned.points.size() << " points." << std::endl;
+			if (final_score < 1.0) { // final-score is '1' unless at least one test converged and assigned a new value
+				std::cout << "has converged with score: " << final_score << " after " << (ros::Time::now().toSec()-ini_time.toSec()) << " for " << cloud_aligned.points.size() << " points." << std::endl;
 			}
 			else
-				std::cout << "has NOT converged after " << (ros::Time::now()-ini_time) << std::endl;
+				std::cout << "has NOT converged after " << (ros::Time::now().toSec()-ini_time.toSec()) << std::endl;
+			// Output the final score:
+			*final_score_out = final_score;
 		return final_result;
 	}
 	
@@ -1005,7 +1092,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	Eigen::Matrix4f odometryComm::estimateTransformation(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final) {
 		if (cloud_final == 0 || cloud_initial == 0) {
 			ROS_INFO("Empty clouds received; returning!"); //ROS_WARN
-			return Eigen::Matrix4f(0,0);
+			return Eigen::Matrix4f::Identity();
 		}
 		
 		
@@ -1071,6 +1158,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// This can be done or not as it's not a meassure but a config
 		  fixed_camera_transform = tf::Transform::getIdentity();
 		  rotate_tf(fixed_camera_transform, kinectRoll, kinectPitch, kinectYaw);
+		  std::cout << "***initial camera fixed tf:" << std::endl; printTransform(fixed_camera_transform);
 	
 		  return fill_in_answer(res.answer);
 	}
@@ -1174,34 +1262,33 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				
 		
 		// Actual processing
-//		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last);
-		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
+		double final_score = 1.0;
+		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last, &final_score);
+//		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
 		
 		tf::Transform tf_result = eigenToTransform(tf_matrix_result);
 		
 		
 		// In case it is needed to make any changes in the transform
 		filter_resulting_TF(tf_result);
+
 		
 		// In case the lineal distance is bigger than the maximum, it's unlikely
 		//that the result is correct since either the maximum is false or the
 		//algorithm failed.
 		ROS_WARN("Raw distance/rotation: %f / %f", transformToDistance(tf_result), transformToRotation(tf_result));
-		if (transformToDistance(tf_result) > maxDistance) {
-			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance", transformToDistance(tf_result));
+		if (transformToDistance(tf_result) > maxDistance || final_score > ICPMinScore) { // TODO: OR score > max_score
+			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance OR score %f > ICPMinScore", transformToDistance(tf_result), final_score);
 			
 			// Status running
 			setOdomStatus(UNRELIABLE_RESULT);
 		}
 		else setOdomStatus(WAITING);
 
-		if (transformToDistance(tf_result)  == 0) {
-			ROS_WARN("THE POSITION IN SPACE HASN'T CHANGED!!");
-		}
-		if (transformToRotation(tf_result)  == 0) {
-			ROS_WARN("THE ORIENTATION HASN'T CHANGED!!");
-		}
-		// ONLY IF THERE ARE CHANGES! (movement) then:
+		if (transformToDistance(tf_result)  == 0) ROS_WARN("Position has NOT changed!");
+		if (transformToRotation(tf_result)  == 0) ROS_WARN("Orientation has NOT changed!");
+
+		// ONLY if there are changes (any movement), then:
 		if (transformToDistance(tf_result)  != 0 || transformToRotation(tf_result)  != 0) {
 			// Calculate the new aligned cloud:
 			PointCloudT::Ptr pointCloud1_aligned(new PointCloudT);
@@ -1212,7 +1299,23 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			pcl_pub_initial.publish(previous);
 			pcl_pub_final.publish(pointCloud1_last);
 			pcl_pub_aligned.publish(pointCloud1_aligned);
+			
 
+			
+			// ****************************************
+			// ** Scary test!!
+//			std::cout << "ATENTION!!!! *********************************" << std::endl;
+//			Eigen::Matrix4f mat_res2 = process2CloudsICP(pointCloud1_aligned, pointCloud1_last);
+//			tf::Transform tf_result2 = eigenToTransform(mat_res2);
+//			printTransform(tf_result2);
+			// ****************************************
+
+			// NOTE: About which pointcloud to store for comparison:
+			//-I store the last REAL cloud because I'm sure that it is correct and so it will be the next estimation, then
+			//-But if the LAST ESTIMATION is wrong, the error will be accumulated while it could be balance if the aligned
+			//versión was used.
+			// Another problem for this is that it's not clear there will be too much difference between the clouds if one
+			//is lost.
 			trimPreviousCloud(pointCloud1_last, cloud_trim_x, cloud_trim_y, cloud_trim_z);
 			// The last PointCloud is stored as the previous one for the next call
 			previous = pointCloud1_last;

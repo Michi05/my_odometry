@@ -93,6 +93,8 @@ public:
 	  static const char PARAM_KEY_ICP_EUCLIDEAN_DISTANCE[];
 	  static const char PARAM_KEY_ICP_RANSAC_ITERATIONS[];
 	  static const char PARAM_KEY_ICP_RANSAC_THRESHOLD[];
+	  static const char PARAM_KEY_ICP_SCORE[];
+
 
 	  static const char PARAM_KEY_CLOUD_TRIM_X[];
 	  static const char PARAM_KEY_CLOUD_TRIM_Y[];
@@ -136,6 +138,7 @@ public:
 	  static const double PARAM_DEFAULT_ICP_EUCLIDEAN_DISTANCE;
 	  static const int PARAM_DEFAULT_ICP_RANSAC_ITERATIONS;
 	  static const double PARAM_DEFAULT_ICP_RANSAC_THRESHOLD;
+	  static const double PARAM_DEFAULT_ICP_SCORE;
 
 	  static const double PARAM_DEFAULT_CLOUD_TRIM_X;
 	  static const double PARAM_DEFAULT_CLOUD_TRIM_Y;
@@ -200,6 +203,8 @@ public:
 	int maxRansacIterations;
 	// Maximum distance between the points considered inliers for the RANSAc estimation.
 	double ransacInlierThreshold;
+	// Minimum "algorithm output score" for an estimation to be considered valid.
+	double ICPMinScore;
 
 	///////// x,y,z values to TRIM POINTCLOUD CLOUD
 	// Ratios (0 to 1) of the previous point cloud for
@@ -441,6 +446,11 @@ private:
 	   */
 	double round(double value, int noDecimals);
 	
+	// TODO: document (again)
+	void applyRestrictions(tf::Transform &tf_input);
+	void changeCoordinates(tf::Transform &tf);
+
+		
 	/**
 	   * Rounds small values of a transform frame to prevent noise from
 	   * being interpreted as movement.
@@ -485,7 +495,7 @@ private:
 	   *   @param tf_result - the transform to be rotated
 	   *   @param fixedTF - the fixed transform with the rotation to be applied
 	   */
-	void multiply_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
+	void get_robot_relative_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
 
 	  /**
 	   * Automatically prints all the data in a transform frame stored as a "tf Transform"
@@ -639,7 +649,8 @@ private:
 	   *   @return The transform frame representing hte relative position between the
 	   *   two pointclouds stored in a Matrix4f.
 	   */
-	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final);
+	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, double *final_score_out=0);
+	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, Eigen::Matrix4f &hint, double *final_score_out=0);
 	
 
 	// TODO: Document if it finally works

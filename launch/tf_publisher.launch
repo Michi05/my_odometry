@@ -22,7 +22,7 @@
   <arg name="period" default="100" />
 
 
-    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster"
+    <node pkg="tf" type="static_transform_publisher" name="$(arg child_id)_bcast"
             args="$(arg x) $(arg y) $(arg z)
             $(arg R) $(arg P) $(arg Y)
             $(arg frame_id) $(arg child_id) $(arg period)" />

@@ -168,11 +168,11 @@ ros/service_traits.h
 my_odometry/odom_answer.h
 ../srv_gen/cpp/include/my_odometry/my_odometry/odom_answer.h
 
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/pcl_odometry.cpp
+/home/r00t/ros_workspace/my_odometry/src/pcl_odometry.cpp
 ros/ros.h
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/ros/ros.h
+/home/r00t/ros_workspace/my_odometry/src/ros/ros.h
 std_msgs/String.h
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/std_msgs/String.h
+/home/r00t/ros_workspace/my_odometry/src/std_msgs/String.h
 message_filters/subscriber.h
 -
 nav_msgs/Odometry.h
@@ -182,6 +182,20 @@ tf/tf.h
 tf/transform_broadcaster.h
 -
 pcl_odometry.hpp
+-
+
+/home/r00t/ros_workspace/my_odometry/src/pcl_to_tf.cpp
+ros/ros.h
+/home/r00t/ros_workspace/my_odometry/src/ros/ros.h
+std_msgs/String.h
+/home/r00t/ros_workspace/my_odometry/src/std_msgs/String.h
+sstream
+-
+pcl_odometry.hpp
+-
+boost/thread.hpp
+-
+signal.h
 -
 
 /opt/ros/fuerte/include/XmlRpcDecl.h
