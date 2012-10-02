@@ -1262,8 +1262,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		
 		// Actual processing
 		double final_score = 1.0;
-//		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last, &final_score);
-		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
+		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last, &final_score);
+//		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
 		
 		tf::Transform tf_result = eigenToTransform(tf_matrix_result);
 		

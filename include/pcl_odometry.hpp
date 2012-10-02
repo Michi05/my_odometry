@@ -64,8 +64,6 @@ typedef tf2_msgs::TFMessage tfMessage; // alternative is "tf::tfMessage"
 
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////
 // ////////////////// odometryComm class for odometry calculations //////////////////////
 // This class is meant to read Point Cloud messages and execute ICP algorithm to estimate
