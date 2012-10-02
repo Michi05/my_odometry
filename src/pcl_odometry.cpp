@@ -804,11 +804,10 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//posición del robot, que no cambió su posición relativa
 		std::cout << "***original_tf:" << std::endl; printTransform(original_tf);
 
-//		resultTF1 = fixedTF.inverseTimes(original_tf) * fixedTF; // == fixedTF * original_TF
-
 		resultTF1 = fixedTF * original_tf * fixedTF.inverse(); // == fixedTF * original_TF
 		std::cout << "***resultTF3:" << std::endl; printTransform(resultTF1);
-
+// TODO: change this for the final version and add the new parameters in the main
+		
 		original_tf = resultTF1;
 	}
 
@@ -1263,21 +1262,25 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		
 		// Actual processing
 		double final_score = 1.0;
-		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last, &final_score);
-//		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
+//		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last, &final_score);
+		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
 		
 		tf::Transform tf_result = eigenToTransform(tf_matrix_result);
 		
 		
 		// In case it is needed to make any changes in the transform
 		filter_resulting_TF(tf_result);
+		
+		//TODO: WATCH OUT: from here on, the transform doesn't represent the relation
+		//between the clouds anymore. So in order to publish the align cloud, it should
+		//be used some kind of "back_to_camera_coordinates" method or so.	
 
 		
 		// In case the lineal distance is bigger than the maximum, it's unlikely
 		//that the result is correct since either the maximum is false or the
 		//algorithm failed.
 		ROS_WARN("Raw distance/rotation: %f / %f", transformToDistance(tf_result), transformToRotation(tf_result));
-		if (transformToDistance(tf_result) > maxDistance || final_score > ICPMinScore) { // TODO: OR score > max_score
+		if (transformToDistance(tf_result) > maxDistance || final_score > ICPMinScore) {
 			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance OR score %f > ICPMinScore", transformToDistance(tf_result), final_score);
 			
 			// Status running

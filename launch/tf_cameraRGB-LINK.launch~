@@ -1,0 +1,30 @@
+
+<!-- 
+## CAMERA FRAME TRANSFORM PUBLISHER
+as it is needed by rviz
+-->
+
+<launch>
+
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+
+  <arg name="R" default="0" />
+  <arg name="P" default="0" />
+  <arg name="Y" default="0" />
+
+  <arg name="frame_id" default="map" />
+  <arg name="child_id" default="camera_rgb_optical_frame" />
+  <arg name="period" default="100" />
+
+  <include file="$(find my_odometry)/launch/tf_publisher.launch">
+        <arg name="child_id" value="$(arg frame_id)" />
+  </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster"
+            args="$(arg x) $(arg y) $(arg z)
+            $(arg R) $(arg P) $(arg Y)
+            $(arg frame_id) $(arg child_id) $(arg period)" />
+</launch>
+
