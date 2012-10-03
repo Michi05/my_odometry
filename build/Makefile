@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/r00t/Dropbox/ros_workspace/my_odometry
+CMAKE_SOURCE_DIR = /home/r00t/ros_workspace/my_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/r00t/Dropbox/ros_workspace/my_odometry/build
+CMAKE_BINARY_DIR = /home/r00t/ros_workspace/my_odometry/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -66,9 +66,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/r00t/Dropbox/ros_workspace/my_odometry/build/CMakeFiles /home/r00t/Dropbox/ros_workspace/my_odometry/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/r00t/ros_workspace/my_odometry/build/CMakeFiles /home/r00t/ros_workspace/my_odometry/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/r00t/Dropbox/ros_workspace/my_odometry/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/r00t/ros_workspace/my_odometry/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -356,6 +356,21 @@ tests/fast:
 .PHONY : tests/fast
 
 # target to build an object file
+src/pcl_myTransf.o:
+	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_myTransf.o
+.PHONY : src/pcl_myTransf.o
+
+# target to preprocess a source file
+src/pcl_myTransf.i:
+	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_myTransf.i
+.PHONY : src/pcl_myTransf.i
+
+# target to generate assembly for a file
+src/pcl_myTransf.s:
+	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_myTransf.s
+.PHONY : src/pcl_myTransf.s
+
+# target to build an object file
 src/pcl_odometry.o:
 	$(MAKE) -f CMakeFiles/pcl_to_tf.dir/build.make CMakeFiles/pcl_to_tf.dir/src/pcl_odometry.o
 .PHONY : src/pcl_odometry.o
@@ -413,6 +428,9 @@ help:
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
+	@echo "... src/pcl_myTransf.o"
+	@echo "... src/pcl_myTransf.i"
+	@echo "... src/pcl_myTransf.s"
 	@echo "... src/pcl_odometry.o"
 	@echo "... src/pcl_odometry.i"
 	@echo "... src/pcl_odometry.s"

@@ -139,7 +139,7 @@ static bool printUsage(std::string nodeName, int argc, char** argv) {
 	  printf("    _%s:=%d\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_MANUAL_MODE,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_MANUAL_MODE);
-	  printf("    _%s:=%d\n",
+	  printf("    _%s:=%f\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_ACCURACY,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_ACCURACY);
       printf("\n");

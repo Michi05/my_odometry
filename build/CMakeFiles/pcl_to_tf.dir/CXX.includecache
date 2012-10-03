@@ -6,6 +6,30 @@
 
 #IncludeRegexTransform: 
 
+../include/pcl_myTransf.hpp
+ros/ros.h
+../include/ros/ros.h
+string
+-
+cmath
+-
+tf/tf.h
+-
+tf/transform_broadcaster.h
+-
+tf_conversions/tf_eigen.h
+-
+Eigen/Geometry
+-
+message_filters/subscriber.h
+-
+nav_msgs/Odometry.h
+-
+std_msgs/String.h
+../include/std_msgs/String.h
+tf2_msgs/TFMessage.h
+../include/tf2_msgs/TFMessage.h
+
 ../include/pcl_odometry.hpp
 ros/ros.h
 ../include/ros/ros.h
@@ -43,14 +67,14 @@ boost/thread.hpp
 -
 string
 -
-pcl_odometry.hpp
--
 Eigen/Geometry
 -
 tf_conversions/tf_eigen.h
 -
 cmath
 -
+tf2_msgs/TFMessage.h
+../include/tf2_msgs/TFMessage.h
 my_odometry/emptyRequest.h
 ../include/my_odometry/emptyRequest.h
 my_odometry/odom_update_srv.h
@@ -59,6 +83,8 @@ my_odometry/statusMsg.h
 ../include/my_odometry/statusMsg.h
 my_odometry/odom_answer.h
 ../include/my_odometry/odom_answer.h
+pcl_myTransf.hpp
+-
 
 ../msg_gen/cpp/include/my_odometry/odom_answer.h
 string
@@ -168,11 +194,17 @@ ros/service_traits.h
 my_odometry/odom_answer.h
 ../srv_gen/cpp/include/my_odometry/my_odometry/odom_answer.h
 
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/pcl_odometry.cpp
+/home/r00t/ros_workspace/my_odometry/src/pcl_myTransf.cpp
 ros/ros.h
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/ros/ros.h
+/home/r00t/ros_workspace/my_odometry/src/ros/ros.h
+pcl_myTransf.hpp
+-
+
+/home/r00t/ros_workspace/my_odometry/src/pcl_odometry.cpp
+ros/ros.h
+/home/r00t/ros_workspace/my_odometry/src/ros/ros.h
 std_msgs/String.h
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/std_msgs/String.h
+/home/r00t/ros_workspace/my_odometry/src/std_msgs/String.h
 message_filters/subscriber.h
 -
 nav_msgs/Odometry.h
@@ -181,14 +213,16 @@ tf/tf.h
 -
 tf/transform_broadcaster.h
 -
+pcl_myTransf.hpp
+-
 pcl_odometry.hpp
 -
 
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/pcl_to_tf.cpp
+/home/r00t/ros_workspace/my_odometry/src/pcl_to_tf.cpp
 ros/ros.h
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/ros/ros.h
+/home/r00t/ros_workspace/my_odometry/src/ros/ros.h
 std_msgs/String.h
-/home/r00t/Dropbox/ros_workspace/my_odometry/src/std_msgs/String.h
+/home/r00t/ros_workspace/my_odometry/src/std_msgs/String.h
 sstream
 -
 pcl_odometry.hpp

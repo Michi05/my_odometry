@@ -32,17 +32,20 @@
 // May24
 #include <boost/thread.hpp>
 #include <string>
-#include <pcl_odometry.hpp>
 // Jul02
 #include <Eigen/Geometry>
 #include <tf_conversions/tf_eigen.h>
 #include <cmath> // For the float std::abs()
+#include "tf2_msgs/TFMessage.h"
 
 // Message types for services
 #include "my_odometry/emptyRequest.h"
 #include "my_odometry/odom_update_srv.h"
 #include "my_odometry/statusMsg.h"
 #include "my_odometry/odom_answer.h"
+
+// Custom class myTransform
+#include <pcl_myTransf.hpp>
 
 
 
@@ -253,7 +256,7 @@ public:
 	boost::mutex callback_mutex;
 	// The transform frames to describe the global position of the robot, the last movement
 	//and the position of the camera on the robot
-	tf::Transform globalTF, lastRelativeTF, fixed_camera_transform;
+	myTransf globalTF, lastRelativeTF, fixed_camera_transform;
 	// Topic publishers for point clouds and the odometry general answer
 	ros::Publisher pcl_pub_aligned, pcl_pub_final, pcl_pub_initial, odom_answer_publisher;
 	// Topic subscribers for the incoming point cloud and the "fixed_camera_transform" updates
@@ -380,16 +383,6 @@ private:
 
     
 	  /**
-	   * Publishes an ROS-odometry-type message to the ROS environment with
-	   * data from the tMatrix transform and using the passed publisher
-	   *   
-	   *   @param odom_publisher - the topic publisher object in which to
-	   *   							put the message in order to send it.
-	   *   @param tMatrix - the tf::Transform from which to read the data for publishing.
-	   */
-	void publishOdom(ros::Publisher &odom_publisher, tf::Transform tMatrix);
-	
-	  /**
 	   * Fetches a new cloud from the passed topic as inmediately as possible
 	   * (as it is suppossed to be the newest existing one).
 	   * It doesn't check the timestamp so that's a responsibility of the calling method.
@@ -424,18 +417,6 @@ private:
 	   */
 	void trimPreviousCloud(PointCloudT::Ptr &pointCloud1_out, double x = 0.75, double y = 0.9, double z = 0.9);
 
-	  /**
-	   * Receives a TF and cleans the data in different possible ways:
-	   *  - Removes measures smaller than the expected accuracy (as they
-	   *  are not reliable).
-	   *  - Changes the coordinates if needed in order to be according to
-	   *  the receiver (RViz visor in this case)
-	   *   
-	   *   @param tf_result - the TF data stored in a tf::Transform
-	   */
-	void filter_resulting_TF(tf::Transform &tf_result);
-
-	
 	/**
 	   * Rounds any Real number to the specified amount of decimals.
 	   *   
@@ -444,64 +425,9 @@ private:
 	   */
 	double round(double value, int noDecimals);
 	
-	// TODO: document (again)
-	void applyRestrictions(tf::Transform &tf_input);
-	void changeCoordinates(tf::Transform &tf);
-
-		
-	/**
-	   * Rounds small values of a transform frame to prevent noise from
-	   * being interpreted as movement.
-	   *   
-	   *   @param tf_result - the tf to be rounded
-	   *   @param margin - the value for the interval to be considered
-	   *   "too near to zero": -margin < tooSmall < margin
-	   */
-	void round_near_zero_values(tf::Transform &tf_result, double margin);
-	
-	/**
-	   * Generates a 6D transform frame describing a position (0, 0, 0) and
-	   * orientation according to the passed values.
-	   *   
-	   *   @param tf - the tf variable in which to store the result
-	   *   @param roll - the X axis rotation to be applied to tf
-	   *   @param pitch - the Y axis rotation to be applied to tf
-	   *   @param yaw - the Z axis rotation to be applied to tf
-	   */
-	bool generate_tf(tf::Transform &tf, double roll, double pitch, double yaw);
-	
-	// TODO: Document: overload of the one above
+	// TODO: Document: overload of transform version
 	bool generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw);
 	
-	/**
-	   * Rotates a transform frame according to the passed values.
-	   * The resulting transform should represent the same movement just from
-	   * a different reference system.
-	   *   
-	   *   @param tf_result - the calculated transform to be rotated
-	   *   @param roll - the X axis rotation to be applied to tf_result
-	   *   @param pitch - the Y axis rotation to be applied to tf_result
-	   *   @param yaw - the Z axis rotation to be applied to tf_result
-	   */
-	void rotate_tf(tf::Transform &tf_result, double roll, double pitch, double yaw);
-
-	/**
-	   * Rotates a transform frame according to the fixed transform that
-	   * describes a relative position. The resulting transform should
-	   * represent the same movement just from a different reference system.
-	   *   
-	   *   @param tf_result - the transform to be rotated
-	   *   @param fixedTF - the fixed transform with the rotation to be applied
-	   */
-	void get_robot_relative_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
-
-	  /**
-	   * Automatically prints all the data in a transform frame stored as a "tf Transform"
-	   *   
-	   *   @param newTF - the transform variable containing the data to be printed
-	   */
-	void printTransform(tf::Transform &newTF);
-
 	  /**
 	   * Automatically prints all the data in a transform frame stored as a Matrix4f
 	   *   
@@ -524,34 +450,6 @@ private:
 	//////////////////////////////////////////////////////
 
 	  /**
-	   * Publishes a transform to the ROS environment using a
-	   * "TransformBroadcaster" object, so it's visible system-wide.
-	   *   
-	   *   @param tMatrix - the tf::Transform to be published.
-	   *   @param tfChannel - The name (id) of the coordinate frame this
-	   *   					transform defines (child).
-	   *   @param tfParent - The name (id) of the coordinate frame in which
-	   *   					the transform is defined. 
-	   */
-	void broadcastTransform(tf::Transform &newTF, std::string tfChannel, std::string tfParent="map");
-
-	  /**
-	   * Calculates the linear movement in a euclidean space in order to
-	   * determine if the movement is to big to be reliable.
-	   *   
-	   *   @param t - transform frame from which to obtain data
-	   */
-	double transformToDistance(tf::Transform t);
-
-	  /**
-	   * Calculates the amount of rotation in order to have a measure
-	   * to determine if the rotation is to big to be reliable.
-	   *   
-	   *   @param t - transform frame from which to obtain data
-	   */
-	double transformToRotation(tf::Transform t);
-
-	  /**
 	   * Extracts the dist data from a transform frame passed as Matrix4f.
 	   *   
 	   *   @param t - transform frame from which to obtain data
@@ -572,6 +470,16 @@ private:
 	   */
 	void matToRPY(Eigen::Matrix4f t, double& roll, double& pitch, double& yaw);
 
+	  /**
+	   * Receives a TF and cleans the data in different possible ways:
+	   * It can remove measures smaller than an expected accuracy (as they
+	   *  are not reliable) or change coordinates if needed in order to be according to
+	   *  the receiver (RViz visor in this case)
+	   *  
+	   *  This is for the developer to add different filterings
+	   */
+	void filter_resulting_TF(myTransf *targetTF);
+
 
 	
 	
@@ -581,22 +489,6 @@ private:
 	//////////////////////////////////////////////////////
 
 	/**
-	   * Converts a transform frame 
-	   * into Odometry/transform frame/tfMessage
-	   *   
-	   *   @param tMatrix - original tf::Transform to return in odometry format.
-	   *   @param stamp - timestamp for the frame. 0 is understood as unknown
-	   *   				or just irrelevant.
-	   *   @param frameID - The name (id) of the coordinate frame in which
-	   *   					the transform is defined. 
-	   *   @param childID - The name (id) of the coordinate frame this
-	   *   					transform defines (child).
-	   *
-	   *   @return the resulting tf with the same data with the new format or type
-	   */
-	nav_msgs::Odometry transformToOdometry(tf::Transform tMatrix, ros::Time stamp = ros::Time(0), std::string frameID = "my_odom_tf", std::string childID = "base_link");
-
-	  /**
 	   * Converts the transform frame stored as tf Transform
 	   * into Odometry/transform frame/tfMessage
 	   *   
@@ -604,25 +496,8 @@ private:
 	   *
 	   *   @return the resulting tf with the same data with the new format or type
 	   */
-	tf::Transform eigenToTransform(Eigen::Matrix4f tMatrix);
-	tf::Transform eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded);
-
-
-	  /**
-	   * Converts the transform frame stored as Matrix4f from the eigen library
-	   * into Odometry/transform frame/tfMessage
-	   *   
-	   *   @param tMatrix - original tf::Transform frame
-	   *   @param stamp - timestamp for the frame. 0 is understood as unknown
-	   *   				or just irrelevant.
-	   *   @param frameID - The name (id) of the coordinate frame in which
-	   *   					the transform is defined. 
-	   *   @param childID - The name (id) of the coordinate frame this
-	   *   					transform defines (child).
-	   *
-	   *   @return the resulting tf with the same data with the new format or type
-	   */
-	tfMessage transformToTFMsg(tf::Transform tMatrix, ros::Time stamp = ros::Time(0), std::string frameID = "my_odom_tf", std::string childID = "base_link");
+	myTransf eigenToTransform(Eigen::Matrix4f tMatrix);
+	myTransf eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded);
 
 	
 	

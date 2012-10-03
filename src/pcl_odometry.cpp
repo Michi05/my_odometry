@@ -11,6 +11,7 @@
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 //May24
+#include <pcl_myTransf.hpp>
 #include <pcl_odometry.hpp>
 
 
@@ -134,8 +135,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	////////////////////////////////////////////////////////////////////	
 	
 	odometryComm::odometryComm() :
-		globalTF(tf::Transform::getIdentity()),
-		lastRelativeTF(tf::Transform::getIdentity()),
+		globalTF(myTransf::getIdentity()),
+		lastRelativeTF(myTransf::getIdentity()),
 		mIsInitialised(false),
 		mSpinner(0),
 		odomStatus(UNLOADED) {
@@ -333,9 +334,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  mSpinner->start();
 		  
 		  // The fixed camera tf needs to be initialized according to rotations
-		  fixed_camera_transform = tf::Transform::getIdentity();
-		  rotate_tf(fixed_camera_transform, kinectRoll, kinectPitch, kinectYaw);
-		  std::cout << "***initial camera fixed tf:" << std::endl; printTransform(fixed_camera_transform);
+		  fixed_camera_transform = myTransf::getIdentity();
+		  fixed_camera_transform.rotate_tf(kinectRoll, kinectPitch, kinectYaw);
+		  std::cout << "***initial camera fixed tf:" << std::endl; fixed_camera_transform.printTransform();
 
 			// Initialise status (no error and not-yet waiting for data)
 		  setOdomStatus(INITIALIZED);
@@ -533,12 +534,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	      printf("\n");
 	}
 
-
-	//=============================================================================
-	void odometryComm::publishOdom(ros::Publisher &odom_publisher, tf::Transform tMatrix) {
-		odom_publisher.publish(transformToOdometry(tMatrix));
-	}
-
 	//=============================================================================
 	PointCloudT::ConstPtr odometryComm::fetchPointCloud (std::string topicName, int timeout){
 	    ros::NodeHandle nodeHandleRelative = ros::NodeHandle();
@@ -648,102 +643,10 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 
 	//=============================================================================
-
-	void odometryComm::applyRestrictions(tf::Transform &tf_input) {
-		/* TODO: 
-		 * Dirty trick that should be ignored
-		 * errors from the algorithm in yaw calculations:
-		*/
-		double R, P, Y;			tf_input.getBasis().getRPY(R, P, Y);
-//		tf::Transform tf;		generate_tf(tf, R/10.0, P, Y/10.0);
-		tf::Transform tf;		generate_tf(tf, R, P, Y);
-		tf.setOrigin(tf_input.getOrigin());
-		tf_input = tf;
-	}
-
-	void odometryComm::changeCoordinates(tf::Transform &tf) {
-		// Adapting the values to the ROS convention:
-		// "3D coordinate systems in ROS are always right-handed, with X
-		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
-		// But (CAUTION!) Point Clouds have ALWAYS Y to represent up and Z for depth,
-		//which is Forward! So the change is: (X, Y, Z)_cloud == (Z_cloud, X_cloud, Y_cloud)_transform
-		
-		// The initial RPY and XYZ values are stored firstly
-		double R, P, Y;			tf.getBasis().getRPY(R, P, Y);
-		btVector3 origin(tf.getOrigin()[2], tf.getOrigin()[0], tf.getOrigin()[1]);
-		// Finally they are stored in 'tf' 
-		generate_tf(tf, P, Y, R);
-		tf.setOrigin(origin);
-	}
-
-	//=============================================================================
-	void odometryComm::filter_resulting_TF(tf::Transform &tf_result) {
-		// A first rounding is needed in order to avoid the noise
-		//(a 0.00001 from the camera must be physical error but
-		//0.001 after transformation is not so clear)
-		round_near_zero_values(tf_result, measureAccuracy);
-		
-		// The known tf is the movement of the camera.
-		//The robot-relative tf is the needed one.
-		get_robot_relative_tf(tf_result, fixed_camera_transform);
-		
-		// This filter removes impossible calculations (like the
-		//robot seemly flying or so)
-		applyRestrictions(tf_result);
-
-		// The last rounding can be removed but it's useful for
-		//removing residual errors because of the maths
-		round_near_zero_values(tf_result, measureAccuracy);
-	}
-
-	//=============================================================================
-	void odometryComm::round_near_zero_values(tf::Transform &tf_result, double accuracy){
-		// MICHI: I remove the near-0 values in the rotations as they are lower than the real detected accuracy
-		// This is done in the first place as the accuracy is from the camera POV, not after the rotations.
-
-		// Check rotations for near-zero values:
-		if (transformToRotation(tf_result) == 0 ) { //< 0.001f) {
-			tf::Quaternion newRotation(0, 0, 0, 1); // XYZW constructor
-	//		newRotation.setRPY(x, y, z);
-			tf_result.setRotation(newRotation);
-		}
-		
-		// Check the origin vector for near-zero values:
-		for (int i=0; i<3; i++) {
-			double val = tf_result.getOrigin()[i];
-			if (val < accuracy && val > -accuracy) {
-				tf_result.getOrigin()[i] = 0;
-			}
-		}
-	}
-
-	//=============================================================================
-	
-	void odometryComm::printTransform(tf::Transform &newTF){
-		/*// This is ommitted as the whole matrix is not needed anymore
-		  for (int i=0; i<3; i++) {
-			  tf::Vector3 tmp = newTF.getBasis()[i];
-			  std::cout << " \t " << tmp.x();
-			  if (tmp.x()==1 || tmp.x()==0)
-				  std::cout << " \t ";
-			  std::cout << " \t " << tmp.y();
-			  if (tmp.y()==1 || tmp.y()==0)
-				  std::cout << " \t ";
-			  std::cout << " \t " << tmp.z() << std::endl;
-		  }
-		  */
-		  std::cout << "(x, y, z) = \t " << newTF.getOrigin().x() << " \t " << newTF.getOrigin().y() << " \t " << newTF.getOrigin().z() << std::endl;
-		  std::cout << "(R, P, Y :: W) normalized = \r\n\t\t " << newTF.getRotation().getX() << " \t " << newTF.getRotation().getY() << " \t " << newTF.getRotation().getZ() << " \t ++ " << newTF.getRotation().getW() << std::endl;
-		  double R, P, Y; newTF.getBasis().getRPY(R, P, Y);
-		  std::cout << "(R, P, Y) = \t " << R << " \t " << P << " \t " << Y << std::endl;
-		  std::cout << std::endl << std::endl;
-	}
-	
-	//=============================================================================
 	
 	void odometryComm::printMatrix4f(Eigen::Matrix4f &tMatrix){
-		  tf::Transform newTF = eigenToTransform(tMatrix);
-		  printTransform(newTF);
+		  myTransf newTF = eigenToTransform(tMatrix);
+		  newTF.printTransform();
 	}
 	
 	//=============================================================================
@@ -754,24 +657,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	
 	//=============================================================================
 
-	bool odometryComm::generate_tf(tf::Transform &tf, double roll, double pitch, double yaw) {
-		tf = tf::Transform::getIdentity();
-		
-		tf::Quaternion newRotation(0, 0, 0, 1); // XYZW quaternion constructor
-		newRotation.setRPY(roll, pitch, yaw);
-//		std::cout << "setRotation(" << x << ", " << y << ", " << z << ")" << std::endl;
-
-		tf.setRotation(newRotation);
-		tf.setOrigin(tf::Vector3(0, 0, 0));
-
-		return true;
-	}
-
-	//=============================================================================
-
 	bool odometryComm::generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw) {
-		tf::Transform tf = tf::Transform::getIdentity();
-		generate_tf(tf, roll, pitch, yaw);
+		myTransf tf = myTransf::getIdentity();
+		tf.generate_tf(roll, pitch, yaw);
 		
 		mat = *(new Eigen::Matrix4f());
 		
@@ -780,60 +668,22 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		return true;
 	}
 
-	//=============================================================================
-
-	void odometryComm::rotate_tf(tf::Transform &original_tf, double roll, double pitch, double yaw) {
-		// Starts by creating a fixedTF with the rotations. Then rotates the original tf
-		tf::Transform fixedTF = tf::Transform::getIdentity();
-		generate_tf(fixedTF, roll, pitch, yaw);
-
-		original_tf.mult(original_tf, fixedTF);
-	}
-
-	
-	//=============================================================================
-
-	void odometryComm::get_robot_relative_tf(tf::Transform &original_tf, tf::Transform &fixedTF) {
-		// (( Remember: matrices are asociative, but not conmutative ))
-
-		tf::Transform resultTF1;
-		// La posición FIJA de la cámara es con respecto a cero (el robot)
-		//el movimiento estimado es el de la cámara
-		//el movimiento compuesto con la posición de la cámara es la nueva posición de la cámara
-		//la nueva posición de la cámara por la inversa de la posición FIJA de la cámara es la
-		//posición del robot, que no cambió su posición relativa
-		std::cout << "***original_tf:" << std::endl; printTransform(original_tf);
-
-		resultTF1 = fixedTF * original_tf * fixedTF.inverse(); // == fixedTF * original_TF
-		std::cout << "***resultTF3:" << std::endl; printTransform(resultTF1);
-// TODO: change this for the final version and add the new parameters in the main
-		
-		original_tf = resultTF1;
-	}
-
 	
 	//////////////////////////////////////////////////////
 	///////// TRANSFORMATION FRAMES' METHODS /////////////
 	//////////////////////////////////////////////////////
-	void odometryComm::broadcastTransform(tf::Transform &newTF, std::string tfChannel, std::string tfParent){
-	  tf::TransformBroadcaster br;
-	  std::cout << "Broadcasting TF \"" << tfChannel << "\" at time: " << ros::Time::now() << std::endl;
-	  printTransform(newTF);
-	  br.sendTransform(tf::StampedTransform(newTF, ros::Time::now(), tfParent, tfChannel));
-	}
-	
-	//=============================================================================
-	tf::Transform odometryComm::eigenToTransform(Eigen::Matrix4f tMatrix) {
+
+	myTransf odometryComm::eigenToTransform(Eigen::Matrix4f tMatrix) {
 	  Eigen::Matrix4d md(tMatrix.cast<double>());
 	  Eigen::Affine3d affine(md);
-	  tf::Transform result;
+	  myTransf result;
  	  tf::TransformEigenToTF(affine, result);
 	  
 	  return result;
 	}
 	
 	//=============================================================================
-	tf::Transform odometryComm::eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded) {
+	myTransf odometryComm::eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded) {
 	  btMatrix3x3 btm;
 	  btm.setValue(tMatrix(0,0),tMatrix(0,1),tMatrix(0,2),
 	             tMatrix(1,0),tMatrix(1,1),tMatrix(1,2),
@@ -841,28 +691,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	  btTransform ret;
 	  ret.setOrigin(btVector3(tMatrix(0,3),tMatrix(1,3),tMatrix(2,3)));
 	  ret.setBasis(btm);
-	  return ret;
-	}
-
-	//=============================================================================
-	double odometryComm::transformToDistance(tf::Transform t){
-		tf::Vector3 origin(t.getOrigin());
-		double sqDistance = 0;
-		for (int i=0; i< 3; i++)
-			sqDistance = origin[i] * origin[i] + sqDistance;
-	    return sqrt(sqDistance);
-	}
-
-	//=============================================================================
-	double odometryComm::transformToRotation(tf::Transform t){
-		double rotSqr = t.getRotation().getW()*t.getRotation().getW();
-		double diff = double(1.00000) - rotSqr;
-		// If the diff between 1.0 and rotSqr is too small
-		//then it is considered 0.0
-		if (diff < rotationAccuracy)
-			return double(0.0);
-//		printf("ROTATION %f: \r\n sqrt(1-%f) = sqrt(%f) = %f != %f\r\n\r\n", t.getRotation().getW(), rotSqr, double(1.0)-rotSqr, sqrt(double(1.0)-rotSqr));
-	    return diff;
+	  return tf::Transform(ret);
 	}
 
 	//=============================================================================
@@ -884,55 +713,32 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 	
 	
-	//////////////////////////////////////////////////////
-	///////// CONVERTERS FROM TRANSFORMATIONS ////////////
-	//////////////////////////////////////////////////////
-	nav_msgs::Odometry odometryComm::transformToOdometry(tf::Transform tMatrix, ros::Time stamp, std::string frameID, std::string childID) {
-		nav_msgs::Odometry odom_msg_output;
+	
+	
 
-		odom_msg_output.header.stamp = stamp;
-		odom_msg_output.header.frame_id = frameID;
-		odom_msg_output.child_frame_id = childID;
-
-		// Translation data
-		odom_msg_output.pose.pose.position.x = tMatrix.getOrigin().getX();
-		odom_msg_output.pose.pose.position.y = tMatrix.getOrigin().getY();
-		odom_msg_output.pose.pose.position.z = tMatrix.getOrigin().getZ();
-		// Rotation data
-		odom_msg_output.pose.pose.orientation.x = tMatrix.getRotation().getX();
-		odom_msg_output.pose.pose.orientation.y = tMatrix.getRotation().getY();
-		odom_msg_output.pose.pose.orientation.z = tMatrix.getRotation().getZ();
-	//	odom_msg_output.pose.pose.orientation.w = rw;
-
-		return odom_msg_output;
-	}
 
 	//=============================================================================
-	tfMessage odometryComm::transformToTFMsg(tf::Transform tMatrix, ros::Time stamp, std::string frameID, std::string childID) {
-		geometry_msgs::TransformStamped tf2_msg_output;
-
-		tf2_msg_output.header.stamp = stamp;
-		tf2_msg_output.header.frame_id = frameID;
-		tf2_msg_output.child_frame_id = childID;
+	void odometryComm::filter_resulting_TF(myTransf *targetTF) {
+		// A first rounding is needed in order to avoid the noise
+		//(a 0.00001 from the camera must be physical error but
+		//0.001 after transformation is not so clear)
+		targetTF->round_near_zero_values(measureAccuracy, rotationAccuracy);
 		
-		// Translation data
-		tf2_msg_output.transform.translation.x = tMatrix.getOrigin().getX();
-		tf2_msg_output.transform.translation.y = tMatrix.getOrigin().getY();
-		tf2_msg_output.transform.translation.z = tMatrix.getOrigin().getZ();
+		// The known tf is the movement of the camera.
+		//The robot-relative tf is the needed one.
+		targetTF->get_robot_relative_tf(fixed_camera_transform);
+		
+		// This filter removes impossible calculations (like the
+		//robot seemly flying or so)
+		targetTF->applyRestrictions();
 
-		// Rotation data
-		tf2_msg_output.transform.rotation.x = tMatrix.getRotation().getX();
-		tf2_msg_output.transform.rotation.y = tMatrix.getRotation().getY();
-		tf2_msg_output.transform.rotation.z = tMatrix.getRotation().getZ();
-	//	odom_msg_output.pose.pose.orientation.w = tMatrix.getRotation().getW();;
-		// TODO: check this again; I don't trust it
-
-		tfMessage newTFMessage;
-		newTFMessage.transforms.push_back(tf2_msg_output);
-		return newTFMessage;
+		// The last rounding can be removed but it's useful for
+		//removing residual errors because of the maths
+		targetTF->round_near_zero_values(measureAccuracy, rotationAccuracy);
 	}
-
-
+	
+	
+	
 	
 	
 	
@@ -1042,7 +848,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			// Guessing with HINT
 			if (hint == Eigen::Matrix4f::Identity()) {
 				std::cout << "No hint received, creating one." << std::endl;
-				tf::Transform newTransf = eigenToTransform(final_result);
+				myTransf newTransf = eigenToTransform(final_result);
 				// TODO: el hint también debería poner a 0 "R y Y" (P en el convenio real)
 //				btVector3 origin(newTransf.getOrigin()[0]/5.0, newTransf.getOrigin()[1]/10.0, newTransf.getOrigin()[2]/2.0);
 				btVector3 origin(0, 0, 0);
@@ -1116,10 +922,10 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	////////////////////////////////////////////////////////////
 	
 	bool odometryComm::fill_in_answer(my_odometry::odom_answer &res) {
-		res.globalTF = transformToTFMsg(globalTF);
-		res.relativeTF = transformToTFMsg(lastRelativeTF);
-		res.globalOdometry = transformToOdometry(globalTF);
-		res.relativeOdometry = transformToOdometry(lastRelativeTF);
+		res.globalTF = globalTF.transformToTFMsg();
+		res.relativeTF = lastRelativeTF.transformToTFMsg();
+		res.globalOdometry = globalTF.transformToOdometry();
+		res.relativeOdometry = lastRelativeTF.transformToOdometry();
 		res.statusCode = odomStatus;
 
 		return true;
@@ -1151,13 +957,13 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		boost::mutex::scoped_lock lock(callback_mutex); // Lock
 		ROS_INFO("Request reset global measures received.");
 		previous=PointCloudT::Ptr(new PointCloudT);
-		globalTF = tf::Transform::getIdentity();
-		lastRelativeTF =  tf::Transform::getIdentity();
+		globalTF = myTransf::getIdentity();
+		lastRelativeTF =  myTransf::getIdentity();
 		
 		// This can be done or not as it's not a meassure but a config
-		  fixed_camera_transform = tf::Transform::getIdentity();
-		  rotate_tf(fixed_camera_transform, kinectRoll, kinectPitch, kinectYaw);
-		  std::cout << "***initial camera fixed tf:" << std::endl; printTransform(fixed_camera_transform);
+		  fixed_camera_transform = myTransf::getIdentity();
+		  fixed_camera_transform.rotate_tf(kinectRoll, kinectPitch, kinectYaw);
+		  std::cout << "***initial camera fixed tf:" << std::endl; fixed_camera_transform.printTransform();
 	
 		  return fill_in_answer(res.answer);
 	}
@@ -1265,11 +1071,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		Eigen::Matrix4f tf_matrix_result = process2CloudsICP(previous, pointCloud1_last, &final_score);
 //		Eigen::Matrix4f tf_matrix_result = estimateTransformation(previous, pointCloud1_last);
 		
-		tf::Transform tf_result = eigenToTransform(tf_matrix_result);
+		myTransf tf_result = eigenToTransform(tf_matrix_result);
 		
 		
 		// In case it is needed to make any changes in the transform
-		filter_resulting_TF(tf_result);
+		filter_resulting_TF(&tf_result);
 		
 		//TODO: WATCH OUT: from here on, the transform doesn't represent the relation
 		//between the clouds anymore. So in order to publish the align cloud, it should
@@ -1279,20 +1085,20 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// In case the lineal distance is bigger than the maximum, it's unlikely
 		//that the result is correct since either the maximum is false or the
 		//algorithm failed.
-		ROS_WARN("Raw distance/rotation: %f / %f", transformToDistance(tf_result), transformToRotation(tf_result));
-		if (transformToDistance(tf_result) > maxDistance || final_score > ICPMinScore) {
-			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance OR score %f > ICPMinScore", transformToDistance(tf_result), final_score);
+		ROS_WARN("Raw distance/rotation: %f / %f", tf_result.transformToDistance(), tf_result.transformToRotation(rotationAccuracy));
+		if (tf_result.transformToDistance() > maxDistance || final_score > ICPMinScore) {
+			ROS_INFO("UNRELIABLE RESULT with distance %f > maxDistance OR score %f > ICPMinScore", tf_result.transformToDistance(), final_score);
 			
 			// Status running
 			setOdomStatus(UNRELIABLE_RESULT);
 		}
 		else setOdomStatus(WAITING);
 
-		if (transformToDistance(tf_result)  == 0) ROS_WARN("Position has NOT changed!");
-		if (transformToRotation(tf_result)  == 0) ROS_WARN("Orientation has NOT changed!");
+		if (tf_result.transformToDistance()  == 0) ROS_WARN("Position has NOT changed!");
+		if (tf_result.transformToRotation(rotationAccuracy)  == 0) ROS_WARN("Orientation has NOT changed!");
 
 		// ONLY if there are changes (any movement), then:
-		if (transformToDistance(tf_result)  != 0 || transformToRotation(tf_result)  != 0) {
+		if (tf_result.transformToDistance()  != 0 || tf_result.transformToRotation(rotationAccuracy)  != 0) {
 			// Calculate the new aligned cloud:
 			PointCloudT::Ptr pointCloud1_aligned(new PointCloudT);
 			pcl_ros::transformAsMatrix(tf_result, tf_matrix_result);
@@ -1309,8 +1115,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			// ** Scary test!!
 //			std::cout << "ATENTION!!!! *********************************" << std::endl;
 //			Eigen::Matrix4f mat_res2 = process2CloudsICP(pointCloud1_aligned, pointCloud1_last);
-//			tf::Transform tf_result2 = eigenToTransform(mat_res2);
-//			printTransform(tf_result2);
+//			myTransf tf_result2 = eigenToTransform(mat_res2);
+//			tf_result2.printTransform();
 			// ****************************************
 
 			// NOTE: About which pointcloud to store for comparison:
@@ -1331,8 +1137,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			
 			// In the end, both known transforms are published both as transforms and
 			//odometry messages.
-			broadcastTransform(globalTF, "globalTF");
-			broadcastTransform(lastRelativeTF, "relativeTF");
+			globalTF.broadcastTransform("globalTF");
+			lastRelativeTF.broadcastTransform("relativeTF");
 			
 			my_odometry::odom_answer newAnswer;
 			fill_in_answer(newAnswer);
