@@ -661,7 +661,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		tf_input = tf;
 	}
 
-	void odometryComm::changeCoordinates(tf::Transform &tf) {
+	void odometryComm::toROSCoordinates(tf::Transform &tf) {
 		// Adapting the values to the ROS convention:
 		// "3D coordinate systems in ROS are always right-handed, with X
 		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
@@ -682,6 +682,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//(a 0.00001 from the camera must be physical error but
 		//0.001 after transformation is not so clear)
 		round_near_zero_values(tf_result, measureAccuracy);
+
+		// As the fixed_camera_transform is in ROS coordinates, the
+		//transform must be changed to the same convention before the
+		//"get_robot_relative_tf" method
+		targetTF->toROSCoordinates(tf_result);
 		
 		// The known tf is the movement of the camera.
 		//The robot-relative tf is the needed one.
@@ -698,8 +703,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 	//=============================================================================
 	void odometryComm::round_near_zero_values(tf::Transform &tf_result, double accuracy){
-		// MICHI: I remove the near-0 values in the rotations as they are lower than the real detected accuracy
-		// This is done in the first place as the accuracy is from the camera POV, not after the rotations.
+		// NOTE: I remove the near-0 values in the rotations if they seem to belower than
+		//the real detectable accuracy. This is done in the first place as the accuracy
+		//is from the camera POV, not after the rotations.
 
 		// Check rotations for near-zero values:
 		if (transformToRotation(tf_result) == 0 ) { //< 0.001f) {
@@ -959,7 +965,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//*****************************
 		// ** Main processing
 		//*****************************
-			ros::Time ini_time = ros::Time::now();
+			ros::Time ini_time = ros::Time::now().toSec(); // TODO: don't forget this change
 			// Sets both clouds into the algorithm
 			icp.setInputCloud(cloud_initial); icp.setInputTarget(cloud_final);
 

@@ -445,9 +445,41 @@ private:
 	   */
 	double round(double value, int noDecimals);
 	
-	// TODO: document (again)
+	/**
+	 * This method allows to clean errors from the algorithm in yaw calculations
+	 * by restricting some values (the height can't change too much) or biasing
+	 * it in case the results are biased somehow (always to the left or something).
+	 * 
+	 * Right now it's not in use, but it can reduce the Roll and Pitch values or
+	 * put 'Z' to zero in case that all of that is just considered irrelevant.
+	 * 
+	 * Once the restrictions are applied, the new transform could be converted back
+	 * to the camera coordinate system and used as a hint for the ICP estimation.
+	 * 
+	 * Precondition: the transform is already in ROS convention coordinates
+	 * and it's obviously assumed that the fixed_camera_tf... is already applied
+	 * so this doesn't depend on its inclination.
+	 * 
+	 */
 	void applyRestrictions(tf::Transform &tf_input);
-	void changeCoordinates(tf::Transform &tf);
+	
+	
+	/**
+	   * Corrects the values from the originally obtained coordinates
+	   * following the ROS convention:
+	   * 
+	   * "3D coordinate systems in ROS are always right-handed, with X
+	   * forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
+	   * 
+	   * But (CAUTION!) Point Clouds have ALWAYS Y to represent up and Z for depth,
+	   * which is Forward! So the change is:
+	   * (X, Y, Z)_cloud == (Z_cloud, X_cloud,Y_cloud)_transform
+	   * 
+	   * 
+	   * 
+	   * Previously called:  void changeCoordinates();
+	   */
+	void toROSCoordinates(tf::Transform &tf);
 
 		
 	/**
@@ -470,8 +502,17 @@ private:
 	   *   @param yaw - the Z axis rotation to be applied to tf
 	   */
 	bool generate_tf(tf::Transform &tf, double roll, double pitch, double yaw);
-	
-	// TODO: Document: overload of the one above
+
+	/**
+	   * Overload of the "generate_tf" above:
+	   * Generates a 6D transform frame describing a position (0, 0, 0) and
+	   * orientation according to the passed values.
+	   *   
+	   *   @param mat - the mat matrix-stored transform in which to store the result
+	   *   @param roll - the X axis rotation to be applied to tf
+	   *   @param pitch - the Y axis rotation to be applied to tf
+	   *   @param yaw - the Z axis rotation to be applied to tf
+	   */
 	bool generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw);
 	
 	/**
@@ -493,6 +534,9 @@ private:
 	   *   
 	   *   @param tf_result - the transform to be rotated
 	   *   @param fixedTF - the fixed transform with the rotation to be applied
+		* 
+		* Precondition: the transform is already in ROS convention coordinates
+		* as the fixed_camera_tf... (fixedTF here) is using them as well.
 	   */
 	void get_robot_relative_tf(tf::Transform &tf_result, tf::Transform &fixedTF);
 
