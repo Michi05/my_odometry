@@ -965,7 +965,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//*****************************
 		// ** Main processing
 		//*****************************
-			ros::Time ini_time = ros::Time::now().toSec(); // TODO: don't forget this change
+			double ini_time = ros::Time::now().toSec();
 			// Sets both clouds into the algorithm
 			icp.setInputCloud(cloud_initial); icp.setInputTarget(cloud_final);
 
@@ -1080,13 +1080,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			// Just in case the cloud_aligned is published
 			//is better to tag it as timestamp==0 to avoid problems
 			cloud_aligned.header.stamp = ros::Time(0);
+			double total_time = ros::Time::now().toSec()-ini_time;
 
 			
 			if (final_score < 1.0) { // final-score is '1' unless at least one test converged and assigned a new value
-				std::cout << "has converged with score: " << final_score << " after " << (ros::Time::now().toSec()-ini_time.toSec()) << " for " << cloud_aligned.points.size() << " points." << std::endl;
+				std::cout << "has converged with score: " << final_score << " after " << total_time << " for " << cloud_aligned.points.size() << " points." << std::endl;
 			}
 			else
-				std::cout << "has NOT converged after " << (ros::Time::now().toSec()-ini_time.toSec()) << std::endl;
+				std::cout << "has NOT converged after " << total_time << std::endl;
 			// Output the final score:
 			*final_score_out = final_score;
 		return final_result;
