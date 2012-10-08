@@ -41,7 +41,6 @@
 // Message types for services
 #include "my_odometry/emptyRequest.h"
 #include "my_odometry/odom_update_srv.h"
-#include "my_odometry/statusMsg.h"
 #include "my_odometry/odom_answer.h"
 
 
@@ -276,7 +275,7 @@ public:
 	
 	/** Services **/
 	//IMPROVEMENT IDEA: group services or structure them in a coherent way
-	ros::ServiceServer *server_resetGlobals;
+	ros::ServiceServer *server_updateOdometry, *server_resetGlobals, *server_getLastStatus;
 	// Status of the odometry process
 	int odomStatus;
 	//...still in need of some agreement...
@@ -699,8 +698,8 @@ private:
 	   *
 	   *   @return true if no error was found.
 	   */
-	bool get_last_status(	my_odometry::statusMsg::Request  &req,
-							my_odometry::statusMsg::Response &res );
+	bool get_last_status(	my_odometry::emptyRequest::Request  &req,
+							my_odometry::emptyRequest::Response &res );
 	  /**
 	   * Reset the accumulative transform frame which stores the current position after
 	   * accumulating several relative transforms.

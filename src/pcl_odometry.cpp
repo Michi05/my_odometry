@@ -322,9 +322,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 		  // Launch services
 		  ros::NodeHandle nHandle("~");
-		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("updateOdometry", &odometryComm::update_odometry, this));
+		  server_updateOdometry = new ros::ServiceServer(nHandle.advertiseService("updateOdometry", &odometryComm::update_odometry, this));
 		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("resetGlobals", &odometryComm::reset_globals, this));
-		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("getLastStatus", &odometryComm::get_last_status, this));
+		  server_getLastStatus = new ros::ServiceServer(nHandle.advertiseService("getLastStatus", &odometryComm::get_last_status, this));
 
 		  //Create and start single-threaded asynchronous spinner to handle incoming
 		  //ROS messages via our sole subscriber.  Use only one thread, since the
@@ -1139,8 +1139,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 
 	//=============================================================================
-	bool odometryComm::get_last_status(	my_odometry::statusMsg::Request  &req,
-							my_odometry::statusMsg::Response &res ) {
+	bool odometryComm::get_last_status(	my_odometry::emptyRequest::Request  &req,
+							my_odometry::emptyRequest::Response &res ) {
 		ROS_INFO("Request for status received, sending back empty response");
 		return fill_in_answer(res.answer);
 	}
