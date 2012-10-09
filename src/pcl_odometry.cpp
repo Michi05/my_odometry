@@ -666,13 +666,15 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// "3D coordinate systems in ROS are always right-handed, with X
 		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
 		// But (CAUTION!) Point Clouds have ALWAYS Y to represent up and Z for depth,
-		//which is Forward! So the change is: (X, Y, Z)_cloud == (Z_cloud, X_cloud, Y_cloud)_transform
+		//which is ((MINUS))Forward! So the change is:
+		//(X, Y, Z)_transform == (-Z_cloud, X_cloud, Y_cloud)
+		
 		
 		// The initial RPY and XYZ values are stored firstly
 		double R, P, Y;			tf.getBasis().getRPY(R, P, Y);
-		btVector3 origin(tf.getOrigin()[2], tf.getOrigin()[0], tf.getOrigin()[1]);
-		// Finally they are stored in 'tf' 
-		generate_tf(tf, P, Y, R);
+		btVector3 origin(-tf.getOrigin()[2], tf.getOrigin()[0], tf.getOrigin()[1]);
+		// Finally they are stored in the 'this' instance
+		tf.generate_tf(P, Y, -R);
 		tf.setOrigin(origin);
 	}
 
@@ -800,20 +802,19 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	//=============================================================================
 
 	void odometryComm::get_robot_relative_tf(tf::Transform &original_tf, tf::Transform &fixedTF) {
+
 		// (( Remember: matrices are asociative, but not conmutative ))
 
 		tf::Transform resultTF1;
-		// La posición FIJA de la cámara es con respecto a cero (el robot)
-		//el movimiento estimado es el de la cámara
-		//el movimiento compuesto con la posición de la cámara es la nueva posición de la cámara
-		//la nueva posición de la cámara por la inversa de la posición FIJA de la cámara es la
-		//posición del robot, que no cambió su posición relativa
-		std::cout << "***original_tf:" << std::endl; printTransform(original_tf);
+		// The fixed camera position is relative to the (0, 0, 0) of the robot
+		//and the odometry estimation is about the camera movement
+		// The fixedTF times camera movement times the inverse of the first must
+		//be the robot's movement as the said relative position is fixed.
+		std::cout << "*** Camera movement:" << std::endl; printTransform(original_tf);
 
-		resultTF1 = fixedTF * original_tf * fixedTF.inverse(); // == fixedTF * original_TF
-		std::cout << "***resultTF3:" << std::endl; printTransform(resultTF1);
-// TODO: change this for the final version and add the new parameters in the main
-		
+		resultTF1 = fixedTF * original_tf * fixedTF.inverse();
+		std::cout << "*** Robot movement:" << std::endl; printTransform(resultTF1);
+				
 		original_tf = resultTF1;
 	}
 
