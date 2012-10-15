@@ -665,14 +665,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// Adapting the values to the ROS convention:
 		// "3D coordinate systems in ROS are always right-handed, with X
 		//forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
-		// But (CAUTION!) Point Clouds have ALWAYS Y to represent DOWN (not up) and Z for depth,
+		// But (CAUTION!) Point Clouds have ALWAYS Y to represent up and Z for depth,
 		//which is ((MINUS))Forward! So the change is:
 		//(X, Y, Z)_transform == (-Z_cloud, X_cloud, Y_cloud)
 		
 		
 		// The initial RPY and XYZ values are stored firstly
 		double R, P, Y;			tf.getBasis().getRPY(R, P, Y);
-		btVector3 origin(-tf.getOrigin()[2], tf.getOrigin()[0], -tf.getOrigin()[1]);
+		btVector3 origin(-tf.getOrigin()[2], tf.getOrigin()[0], tf.getOrigin()[1]);
 		// Finally they are stored in the 'this' instance
 		tf.generate_tf(P, Y, -R);
 		tf.setOrigin(origin);
