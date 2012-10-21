@@ -240,7 +240,7 @@ public:
 	std::string outputOdometryAnswer_topic;
 	
 	///////// PCL_Odometry Configuration:
-	bool manualMode, ignoreTime;
+	bool manualMode, ignoreTimestamp;
 	double measureAccuracy, rotationAccuracy;
 
 	//////// Physical Description Configuration:

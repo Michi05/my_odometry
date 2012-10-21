@@ -216,7 +216,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.param(PARAM_KEY_TOPIC_ODOMETRY_ANSWER, outputOdometryAnswer_topic, std::string(PARAM_DEFAULT_TOPIC_ODOMETRY_ANSWER));
 
 		    nodeHandlePrivate.param(PARAM_KEY_MANUAL_MODE, manualMode, PARAM_DEFAULT_MANUAL_MODE);
-		    nodeHandlePrivate.param(PARAM_KEY_IGNORE_TIME, ignoreTime, PARAM_DEFAULT_IGNORE_TIME);
+		    nodeHandlePrivate.param(PARAM_KEY_IGNORE_TIME, ignoreTimestamp, PARAM_DEFAULT_IGNORE_TIME);
 		    nodeHandlePrivate.param(PARAM_KEY_ACCURACY, measureAccuracy, PARAM_DEFAULT_ACCURACY);
 		    nodeHandlePrivate.param(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy, PARAM_DEFAULT_ROTATION_ACCURACY);
 
@@ -264,7 +264,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.setParam(PARAM_KEY_TOPIC_ODOMETRY_ANSWER, outputOdometryAnswer_topic);
 
 		    nodeHandlePrivate.setParam(PARAM_KEY_MANUAL_MODE, manualMode);
-		    nodeHandlePrivate.setParam(PARAM_KEY_IGNORE_TIME, ignoreTime);
+		    nodeHandlePrivate.setParam(PARAM_KEY_IGNORE_TIME, ignoreTimestamp);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ACCURACY, measureAccuracy);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy);
 
@@ -513,7 +513,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				  manualMode);
 		  printf("    _%s:=%d\n",
 				  PARAM_KEY_IGNORE_TIME,
-				  ignoreTime);
+				  ignoreTimestamp);
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_ACCURACY,
 				  measureAccuracy);
@@ -1220,10 +1220,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			return; // Nothing can be done without points
 		}
 		
-		// If "ignoreTime" is false and the timestamp is old,
+		// If "ignoreTimestamp" is false and the timestamp is old,
 		//the cloud is rejected and a new one is fetched.
-		if (ignoreTime==false) {
-			while (pointCloud1_aux->header.stamp.toSec() < ros::Time::now().toSec()-2) {
+		if (ignoreTimestamp==false) {
+			double maxTime = 2.0; // TODO: this must end up being an external parameter
+			while (pointCloud1_aux->header.stamp.toSec() < ros::Time::now().toSec()-maxTime) {
 				ROS_INFO("Old PCL received; asking for a new one.");
 				pointCloud1_aux=fetchPointCloud (nextTopic);
 			}
