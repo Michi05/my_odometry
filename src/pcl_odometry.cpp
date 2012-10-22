@@ -838,18 +838,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	  
 	  return result;
 	}
-	
-	//=============================================================================
-	tf::Transform odometryComm::eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded) {
-	  btMatrix3x3 btm;
-	  btm.setValue(tMatrix(0,0),tMatrix(0,1),tMatrix(0,2),
-	             tMatrix(1,0),tMatrix(1,1),tMatrix(1,2),
-	             tMatrix(2,0),tMatrix(2,1),tMatrix(2,2));
-	  btTransform ret;
-	  ret.setOrigin(btVector3(tMatrix(0,3),tMatrix(1,3),tMatrix(2,3)));
-	  ret.setBasis(btm);
-	  return ret;
-	}
 
 	//=============================================================================
 	double odometryComm::transformToDistance(tf::Transform t){

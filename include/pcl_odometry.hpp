@@ -650,7 +650,6 @@ private:
 	   *   @return the resulting tf with the same data with the new format or type
 	   */
 	tf::Transform eigenToTransform(Eigen::Matrix4f tMatrix);
-	tf::Transform eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded);
 
 
 	  /**
