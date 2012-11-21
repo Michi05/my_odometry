@@ -68,6 +68,10 @@ const char   odometryComm::PARAM_KEY_IGNORE_TIME[] =    "odometry_ignore_time";
 const char   odometryComm::PARAM_KEY_ACCURACY[] =    "odometry_measure_accuracy";
 const char   odometryComm::PARAM_KEY_ROTATION_ACCURACY[] =    "odometry_rotation_accuracy";
 
+const char   odometryComm::PARAM_KEY_KINECT_X[] =    "kinect_x";
+const char   odometryComm::PARAM_KEY_KINECT_Y[] =    "kinect_y";
+const char   odometryComm::PARAM_KEY_KINECT_Z[] =    "kinect_z";
+
 const char   odometryComm::PARAM_KEY_KINECT_ROLL[] =    "kinect_roll";
 const char   odometryComm::PARAM_KEY_KINECT_PITCH[] =    "kinect_pitch";
 const char   odometryComm::PARAM_KEY_KINECT_YAW[] =    "kinect_yaw";
@@ -111,6 +115,10 @@ const bool   odometryComm::PARAM_DEFAULT_MANUAL_MODE = true;
 const bool   odometryComm::PARAM_DEFAULT_IGNORE_TIME = true;
 const double   odometryComm::PARAM_DEFAULT_ACCURACY = 0.01;
 const double   odometryComm::PARAM_DEFAULT_ROTATION_ACCURACY = 0.0001;
+
+const double   odometryComm::PARAM_DEFAULT_KINECT_X = 0.0f;
+const double   odometryComm::PARAM_DEFAULT_KINECT_Y = 0.0f;
+const double   odometryComm::PARAM_DEFAULT_KINECT_Z = 0.0f;
 
 const double   odometryComm::PARAM_DEFAULT_KINECT_ROLL = 0.0f;
 const double   odometryComm::PARAM_DEFAULT_KINECT_PITCH = 0.0f;
@@ -217,10 +225,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.param(PARAM_KEY_TOPIC_ODOMETRY_ANSWER, outputOdometryAnswer_topic, std::string(PARAM_DEFAULT_TOPIC_ODOMETRY_ANSWER));
 
 		    nodeHandlePrivate.param(PARAM_KEY_MANUAL_MODE, manualMode, PARAM_DEFAULT_MANUAL_MODE);
-		    nodeHandlePrivate.param(PARAM_KEY_IGNORE_TIME, ignoreTime, PARAM_DEFAULT_IGNORE_TIME);
+		    nodeHandlePrivate.param(PARAM_KEY_IGNORE_TIME, ignoreTimestamp, PARAM_DEFAULT_IGNORE_TIME);
 		    nodeHandlePrivate.param(PARAM_KEY_ACCURACY, measureAccuracy, PARAM_DEFAULT_ACCURACY);
 		    nodeHandlePrivate.param(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy, PARAM_DEFAULT_ROTATION_ACCURACY);
 
+
+		    nodeHandlePrivate.param(PARAM_KEY_KINECT_X, kinectX, PARAM_DEFAULT_KINECT_X);
+		    nodeHandlePrivate.param(PARAM_KEY_KINECT_Y, kinectY, PARAM_DEFAULT_KINECT_Y);
+		    nodeHandlePrivate.param(PARAM_KEY_KINECT_Z, kinectZ, PARAM_DEFAULT_KINECT_Z);
 
 		    nodeHandlePrivate.param(PARAM_KEY_KINECT_ROLL, kinectRoll, PARAM_DEFAULT_KINECT_ROLL);
 		    nodeHandlePrivate.param(PARAM_KEY_KINECT_PITCH, kinectPitch, PARAM_DEFAULT_KINECT_PITCH);
@@ -265,9 +277,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.setParam(PARAM_KEY_TOPIC_ODOMETRY_ANSWER, outputOdometryAnswer_topic);
 
 		    nodeHandlePrivate.setParam(PARAM_KEY_MANUAL_MODE, manualMode);
-		    nodeHandlePrivate.setParam(PARAM_KEY_IGNORE_TIME, ignoreTime);
+		    nodeHandlePrivate.setParam(PARAM_KEY_IGNORE_TIME, ignoreTimestamp);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ACCURACY, measureAccuracy);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy);
+
+		    
+		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_X, kinectX);
+		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_Y, kinectY);
+		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_Z, kinectZ);
 
 		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_ROLL, kinectRoll);
 		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_PITCH, kinectPitch);
@@ -323,9 +340,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 		  // Launch services
 		  ros::NodeHandle nHandle("~");
-		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("updateOdometry", &odometryComm::update_odometry, this));
+		  server_updateOdometry = new ros::ServiceServer(nHandle.advertiseService("updateOdometry", &odometryComm::update_odometry, this));
 		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("resetGlobals", &odometryComm::reset_globals, this));
-		  server_resetGlobals = new ros::ServiceServer(nHandle.advertiseService("getLastStatus", &odometryComm::get_last_status, this));
+		  server_getLastStatus = new ros::ServiceServer(nHandle.advertiseService("getLastStatus", &odometryComm::get_last_status, this));
 
 		  //Create and start single-threaded asynchronous spinner to handle incoming
 		  //ROS messages via our sole subscriber.  Use only one thread, since the
@@ -334,8 +351,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  mSpinner->start();
 		  
 		  // The fixed camera tf needs to be initialized according to rotations
-		  fixed_camera_transform = myTransf::getIdentity();
-		  fixed_camera_transform.rotate_tf(kinectRoll, kinectPitch, kinectYaw);
+		  fixed_camera_transform.generate_tf(kinectRoll, kinectPitch, kinectYaw);
+		  fixed_camera_transform.setOrigin(tf::Vector3(kinectX, kinectY, kinectZ));
 		  std::cout << "***initial camera fixed tf:" << std::endl; fixed_camera_transform.printTransform();
 
 			// Initialise status (no error and not-yet waiting for data)
@@ -346,7 +363,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  //Return result
 		  return true;
 		}
-	  
+
 		//=============================================================================
 		bool odometryComm::shutdown() {
 		  //Lock access to is initialised
@@ -442,6 +459,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  printf("    _%s:=%E\n",
 				  PARAM_KEY_ICP_SCORE,
 				  ICPMinScore);
+		  
+		  printf("\n");
 
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_CLOUD_TRIM_X,
@@ -452,6 +471,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_CLOUD_TRIM_Z,
 				  cloud_trim_z);
+		  
+		  printf("\n");
 		  
 		  printf("    _%s:=%E\n",
 				  PARAM_KEY_RESOLUTION_LEAF_SIZE,
@@ -479,6 +500,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		  printf("    _%s:=%d\n",
 				  PARAM_KEY_NOISE_FILTERING,
 				  doNoiseFiltering);
+		  
+		  printf("\n");
 
 		  printf("    _%s:=%s\n",
 				  PARAM_KEY_TOPIC_INPUT_STR,
@@ -509,19 +532,32 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				  PARAM_KEY_TOPIC_ODOMETRY_ANSWER,
 				  outputOdometryAnswer_topic.c_str());
 		  
+		  printf("\n");
+		  
 		  printf("    _%s:=%d\n",
 				  PARAM_KEY_MANUAL_MODE,
 				  manualMode);
 		  printf("    _%s:=%d\n",
 				  PARAM_KEY_IGNORE_TIME,
-				  ignoreTime);
+				  ignoreTimestamp);
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_ACCURACY,
 				  measureAccuracy);
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_ROTATION_ACCURACY,
 				  rotationAccuracy);
+		  
+		  printf("\n");
 
+		  printf("    _%s:=%f\n",
+				  PARAM_KEY_KINECT_X,
+				  kinectX);
+		  printf("    _%s:=%f\n",
+				  PARAM_KEY_KINECT_Y,
+				  kinectY);
+		  printf("    _%s:=%f\n",
+				  PARAM_KEY_KINECT_Z,
+				  kinectZ);
 		  printf("    _%s:=%f\n",
 				  PARAM_KEY_KINECT_ROLL,
 				  kinectRoll);
@@ -626,7 +662,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			//the new min/max (after trimming) are calculated according to 'z'
 			double minTrim = minDepth + d*(1.0f-z), maxTrim = minDepth + d*z;
 			pcl::PassThrough<PointT> pass;
-			std::cout << " \t trimming z in " << minTrim << ", " << maxTrim << std::endl << std::endl;
+//			std::cout << " \t trimming z in " << minTrim << ", " << maxTrim << std::endl << std::endl;
 			pass.setInputCloud (ptcld);
 			pass.setFilterFieldName ("z");
 			pass.setFilterLimits (minTrim, maxTrim);
@@ -683,18 +719,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 	
 	//=============================================================================
-	myTransf odometryComm::eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded) {
-	  btMatrix3x3 btm;
-	  btm.setValue(tMatrix(0,0),tMatrix(0,1),tMatrix(0,2),
-	             tMatrix(1,0),tMatrix(1,1),tMatrix(1,2),
-	             tMatrix(2,0),tMatrix(2,1),tMatrix(2,2));
-	  btTransform ret;
-	  ret.setOrigin(btVector3(tMatrix(0,3),tMatrix(1,3),tMatrix(2,3)));
-	  ret.setBasis(btm);
-	  return tf::Transform(ret);
-	}
-
-	//=============================================================================
 	double odometryComm::matToDist(Eigen::Matrix4f t){
 	    return sqrt(t(0,3)*t(0,3)+t(1,3)*t(1,3)+t(2,3)*t(2,3));
 	}
@@ -722,10 +746,17 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		// A first rounding is needed in order to avoid the noise
 		//(a 0.00001 from the camera must be physical error but
 		//0.001 after transformation is not so clear)
-		targetTF->round_near_zero_values(measureAccuracy, rotationAccuracy);
+//		targetTF->round_near_zero_values(measureAccuracy, rotationAccuracy);
+
+		// As the fixed_camera_transform is in ROS coordinates, the
+		//transform must be changed to the same convention before the
+		//"get_robot_relative_tf" method
+		targetTF->toROSCoordinates();
 		
 		// The known tf is the movement of the camera.
 		//The robot-relative tf is the needed one.
+		// NOTE: Precondition: This method expects the targetTF to be
+		//already following the ros agreement for coordinates!
 		targetTF->get_robot_relative_tf(fixed_camera_transform);
 		
 		// This filter removes impossible calculations (like the
@@ -765,7 +796,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		//*****************************
 		// ** Main processing
 		//*****************************
-			ros::Time ini_time = ros::Time::now();
+			double ini_time = ros::Time::now().toSec();
 			// Sets both clouds into the algorithm
 			icp.setInputCloud(cloud_initial); icp.setInputTarget(cloud_final);
 
@@ -778,19 +809,19 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			else
 				ROS_ERROR("The algorithm is supposed to be run with positive values for the MAIN parameters but one or several aren't: maxIterations = %d, epsilon = %f, maxDistance = %f", maxIterations, epsilon, maxDistance);
 			std::cout << std::endl << std::endl;
-				if (euclideanDistance > 0)
-					icp.setEuclideanFitnessEpsilon (euclideanDistance);
-				else
-					printf("euclideanDistance is: %E\r\n", icp.getEuclideanFitnessEpsilon());
-				if (maxRansacIterations != 0)
-					icp.setRANSACIterations (maxRansacIterations);
-				else
-					printf("maxRansacIterations is: %E\r\n", icp.getRANSACIterations());
-				if (ransacInlierThreshold > 0)
-					icp.setRANSACOutlierRejectionThreshold (ransacInlierThreshold);
-				else
-					printf("ransacInlierThreshold is: %E\r\n", icp.getRANSACOutlierRejectionThreshold());
-				std::cout << std::endl << std::endl;
+			if (euclideanDistance > 0)
+				icp.setEuclideanFitnessEpsilon (euclideanDistance);
+			else
+				printf("euclideanDistance is: %E\r\n", icp.getEuclideanFitnessEpsilon());
+			if (maxRansacIterations != 0)
+				icp.setRANSACIterations (maxRansacIterations);
+			else
+				printf("maxRansacIterations is: %E\r\n", icp.getRANSACIterations());
+			if (ransacInlierThreshold > 0)
+				icp.setRANSACOutlierRejectionThreshold (ransacInlierThreshold);
+			else
+				printf("ransacInlierThreshold is: %E\r\n", icp.getRANSACOutlierRejectionThreshold());
+			std::cout << std::endl << std::endl;
 			
 			
 // **********************************************************			
@@ -812,7 +843,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				final_result = icp.getFinalTransformation();
 				std::cout << "Score after first try is " << final_score << std::endl;
 			}
-
+/*
 			// Guessing negative pitch:
 			generate_tf(guess, 0, -0.1, 0);
 			icp.align(cloud_aligned, guess); // If there's any guess
@@ -830,29 +861,27 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 				final_score = icp.getFitnessScore();
 				final_result = icp.getFinalTransformation();
 			}
+*/
 
-
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			// Guessing with HINT
 			if (hint == Eigen::Matrix4f::Identity()) {
 				std::cout << "No hint received, creating one." << std::endl;
+				// Getting the Transform version of the matrix for the calculations
 				myTransf newTransf = eigenToTransform(final_result);
-				// TODO: el hint también debería poner a 0 "R y Y" (P en el convenio real)
-//				btVector3 origin(newTransf.getOrigin()[0]/5.0, newTransf.getOrigin()[1]/10.0, newTransf.getOrigin()[2]/2.0);
-				btVector3 origin(0, 0, 0);
+
+				// Storing the current original values before the modifications
+				double R, P, Y;			newTransf.getBasis().getRPY(R, P, Y);
+				tf::Vector3 origin = newTransf.getOrigin(); // tf::Vector3(0, 0, 0);
+				
+				// Generate the new tf and apply rules
+				origin = tf::Vector3(0, 0, 0);
+//				btVector3 origin(0, 0, 0); // Changing origin of coordinates ((tf::Vector3(0, 0, 0)))
+
+					// ((The new TF is generated with the RPY values))
+				newTransf.generate_tf(0, P*1.2, 0); // Real Yaw is cloud's Pitch
 				newTransf.setOrigin(origin);
+				
+				// Back to the matrix version for the hint
 				pcl_ros::transformAsMatrix(newTransf, hint);
 			}
 			else std::cout << "Using passed hint." << std::endl;
@@ -868,25 +897,17 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			// NOTE: I REALLY would use the last correct estimation as a hint.
 			
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			// Just in case the cloud_aligned is published
-			//is better to tag it as timestamp==0 to avoid problems
+			//it's better to tag it as timestamp==0 to avoid problems
 			cloud_aligned.header.stamp = ros::Time(0);
-
+			double total_time = (ros::Time::now().toSec()-ini_time) / 2.0;
+			
 			
 			if (final_score < 1.0) { // final-score is '1' unless at least one test converged and assigned a new value
-				std::cout << "has converged with score: " << final_score << " after " << (ros::Time::now().toSec()-ini_time.toSec()) << " for " << cloud_aligned.points.size() << " points." << std::endl;
+				std::cout << "has converged with score: " << final_score << " after " << total_time << " for " << cloud_aligned.points.size() << " points." << std::endl;
 			}
 			else
-				std::cout << "has NOT converged after " << (ros::Time::now().toSec()-ini_time.toSec()) << std::endl;
+				std::cout << "has NOT converged after " << total_time << std::endl;
 			// Output the final score:
 			*final_score_out = final_score;
 		return final_result;
@@ -945,8 +966,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	}
 
 	//=============================================================================
-	bool odometryComm::get_last_status(	my_odometry::statusMsg::Request  &req,
-							my_odometry::statusMsg::Response &res ) {
+	bool odometryComm::get_last_status(	my_odometry::emptyRequest::Request  &req,
+							my_odometry::emptyRequest::Response &res ) {
 		ROS_INFO("Request for status received, sending back empty response");
 		return fill_in_answer(res.answer);
 	}
@@ -961,8 +982,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		lastRelativeTF =  myTransf::getIdentity();
 		
 		// This can be done or not as it's not a meassure but a config
-		  fixed_camera_transform = myTransf::getIdentity();
-		  fixed_camera_transform.rotate_tf(kinectRoll, kinectPitch, kinectYaw);
+		  fixed_camera_transform.generate_tf(kinectRoll, kinectPitch, kinectYaw);
+		  fixed_camera_transform.setOrigin(tf::Vector3(kinectX, kinectY, kinectZ));
 		  std::cout << "***initial camera fixed tf:" << std::endl; fixed_camera_transform.printTransform();
 	
 		  return fill_in_answer(res.answer);
@@ -974,6 +995,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	void odometryComm::cameraTF_callback(const tf::tfMessageConstPtr& newTF) {
 		const tf::tfMessage& msg_in = *newTF;
 		tf::transformMsgToTF(msg_in.transforms[0].transform, fixed_camera_transform);
+
+		std::cout << "***new camera fixed tf:" << std::endl; fixed_camera_transform.printTransform();
+
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -1018,10 +1042,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			return; // Nothing can be done without points
 		}
 		
-		// If "ignoreTime" is false and the timestamp is old,
+		// If "ignoreTimestamp" is false and the timestamp is old,
 		//the cloud is rejected and a new one is fetched.
-		if (ignoreTime==false) {
-			while (pointCloud1_aux->header.stamp.toSec() < ros::Time::now().toSec()-2) {
+		if (ignoreTimestamp==false) {
+			double maxTime = 2.0; // TODO: this must end up being an external parameter
+			while (pointCloud1_aux->header.stamp.toSec() < ros::Time::now().toSec()-maxTime) {
 				ROS_INFO("Old PCL received; asking for a new one.");
 				pointCloud1_aux=fetchPointCloud (nextTopic);
 			}
@@ -1073,13 +1098,15 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		
 		myTransf tf_result = eigenToTransform(tf_matrix_result);
 		
-		
-		// In case it is needed to make any changes in the transform
+
+//***********************************************************************************************
+//**************** In case it is needed to make any changes in the transform
 		filter_resulting_TF(&tf_result);
-		
-		//TODO: WATCH OUT: from here on, the transform doesn't represent the relation
-		//between the clouds anymore. So in order to publish the align cloud, it should
-		//be used some kind of "back_to_camera_coordinates" method or so.	
+//***********************************************************************************************
+		//WATCH OUT: from here on, the transform doesn't represent the relation
+		//between the clouds anymore. So in order to publish the aligned clouds,
+		//the "back_to_cloud_matrix" method must be used.
+//***********************************************************************************************
 
 		
 		// In case the lineal distance is bigger than the maximum, it's unlikely
@@ -1101,23 +1128,13 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		if (tf_result.transformToDistance()  != 0 || tf_result.transformToRotation(rotationAccuracy)  != 0) {
 			// Calculate the new aligned cloud:
 			PointCloudT::Ptr pointCloud1_aligned(new PointCloudT);
-			pcl_ros::transformAsMatrix(tf_result, tf_matrix_result);
-			pcl::transformPointCloud (*previous, *pointCloud1_aligned, tf_matrix_result);
+			tf_result.back_to_cloud_matrix(fixed_camera_transform, tf_matrix_result);
+			pcl::transformPointCloud (*previous, *pointCloud1_aligned, tf_matrix_result); //Doesn't work now
 
 			// Publish all the results
 			pcl_pub_initial.publish(previous);
 			pcl_pub_final.publish(pointCloud1_last);
 			pcl_pub_aligned.publish(pointCloud1_aligned);
-			
-
-			
-			// ****************************************
-			// ** Scary test!!
-//			std::cout << "ATENTION!!!! *********************************" << std::endl;
-//			Eigen::Matrix4f mat_res2 = process2CloudsICP(pointCloud1_aligned, pointCloud1_last);
-//			myTransf tf_result2 = eigenToTransform(mat_res2);
-//			tf_result2.printTransform();
-			// ****************************************
 
 			// NOTE: About which pointcloud to store for comparison:
 			//-I store the last REAL cloud because I'm sure that it is correct and so it will be the next estimation, then

@@ -41,7 +41,6 @@
 // Message types for services
 #include "my_odometry/emptyRequest.h"
 #include "my_odometry/odom_update_srv.h"
-#include "my_odometry/statusMsg.h"
 #include "my_odometry/odom_answer.h"
 
 // Custom class myTransform
@@ -128,6 +127,11 @@ public:
 	  static const char PARAM_KEY_ACCURACY[];
 	  static const char PARAM_KEY_ROTATION_ACCURACY[];
 
+	  
+	  static const char PARAM_KEY_KINECT_X[];
+	  static const char PARAM_KEY_KINECT_Y[];
+	  static const char PARAM_KEY_KINECT_Z[];
+
 	  static const char PARAM_KEY_KINECT_ROLL[];
 	  static const char PARAM_KEY_KINECT_PITCH[];
 	  static const char PARAM_KEY_KINECT_YAW[];
@@ -173,6 +177,10 @@ public:
 	  static const double PARAM_DEFAULT_ROTATION_ACCURACY;
 
 
+	  static const double PARAM_DEFAULT_KINECT_X;
+	  static const double PARAM_DEFAULT_KINECT_Y;
+	  static const double PARAM_DEFAULT_KINECT_Z;
+	  
 	  static const double PARAM_DEFAULT_KINECT_ROLL;
 	  static const double PARAM_DEFAULT_KINECT_PITCH;
 	  static const double PARAM_DEFAULT_KINECT_YAW;
@@ -242,10 +250,11 @@ public:
 	std::string outputOdometryAnswer_topic;
 	
 	///////// PCL_Odometry Configuration:
-	bool manualMode, ignoreTime;
+	bool manualMode, ignoreTimestamp;
 	double measureAccuracy, rotationAccuracy;
 
 	//////// Physical Description Configuration:
+	double kinectX,kinectY, kinectZ;
 	double kinectRoll,kinectPitch, kinectYaw;
 	
 	
@@ -277,7 +286,7 @@ public:
 	
 	/** Services **/
 	//IMPROVEMENT IDEA: group services or structure them in a coherent way
-	ros::ServiceServer *server_resetGlobals;
+	ros::ServiceServer *server_updateOdometry, *server_resetGlobals, *server_getLastStatus;
 	// Status of the odometry process
 	int odomStatus;
 	//...still in need of some agreement...
@@ -425,7 +434,15 @@ private:
 	   */
 	double round(double value, int noDecimals);
 	
-	// TODO: Document: overload of transform version
+	/**
+	   * Generates a 6D transform frame describing a position (0, 0, 0) and
+	   * orientation according to the passed values.
+	   *   
+	   *   @param mat - the Matrix4f in which to store the result
+	   *   @param roll - the X axis rotation to be applied to tf
+	   *   @param pitch - the Y axis rotation to be applied to tf
+	   *   @param yaw - the Z axis rotation to be applied to tf
+	   */
 	bool generate_tf(Eigen::Matrix4f &mat, double roll, double pitch, double yaw);
 	
 	  /**
@@ -497,7 +514,6 @@ private:
 	   *   @return the resulting tf with the same data with the new format or type
 	   */
 	myTransf eigenToTransform(Eigen::Matrix4f tMatrix);
-	myTransf eigenToTransform(Eigen::Matrix4f tMatrix, bool overloaded);
 
 	
 	
@@ -519,14 +535,23 @@ private:
 	   *   @param cloud_final - second PC for the algorithm, which should be the final
 	   *   						position to which to compare with.
 	   *
-	   *   @return The transform frame representing hte relative position between the
+	   *   @return The transform frame representing the relative position between the
 	   *   two pointclouds stored in a Matrix4f.
 	   */
 	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, double *final_score_out=0);
 	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, Eigen::Matrix4f &hint, double *final_score_out=0);
 	
-
-	// TODO: Document if it finally works
+	  /**
+	   * Alternative to "process2CloudsICP" using SVD based algorithm
+	   *   
+	   *   @param cloud_initial - first PC for the algorithm. This one is suppossed to be the
+	   *   					initial one in chronological order.
+	   *   @param cloud_final - second PC for the algorithm, which should be the final
+	   *   						position to which to compare with.
+	   *
+	   *   @return The transform frame representing the relative position between the
+	   *   two pointclouds stored in a Matrix4f.
+	   */
 	Eigen::Matrix4f estimateTransformation(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final);
 
 	
@@ -572,8 +597,8 @@ private:
 	   *
 	   *   @return true if no error was found.
 	   */
-	bool get_last_status(	my_odometry::statusMsg::Request  &req,
-							my_odometry::statusMsg::Response &res );
+	bool get_last_status(	my_odometry::emptyRequest::Request  &req,
+							my_odometry::emptyRequest::Response &res );
 	  /**
 	   * Reset the accumulative transform frame which stores the current position after
 	   * accumulating several relative transforms.

@@ -27,8 +27,8 @@ rosbuild_gensrv()
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 rosbuild_add_executable(
-    pcl_to_tf
-    src/pcl_to_tf.cpp
+    odometry_main
+    src/odometry_main.cpp
     src/pcl_myTransf.cpp
     src/pcl_odometry.cpp
     )

@@ -14,6 +14,8 @@
 #include <tf_conversions/tf_eigen.h>
 #include <Eigen/Geometry>
 
+#include <pcl_ros/impl/transforms.hpp> // For transformAsMatrix
+
 // ROS Messages and formats
 #include <message_filters/subscriber.h> // topic subscriber
 #include <nav_msgs/Odometry.h>
@@ -151,17 +153,48 @@ public:
 	////////// HANDLERS FOR MODIFYING TFs //////////////
 	////////////////////////////////////////////////////
 
-	// TODO: document (again)
+	/**
+	 * This method allows to clean errors from the algorithm in yaw calculations
+	 * by restricting some values (the height can't change too much) or biasing
+	 * it in case the results are biased somehow (always to the left or something).
+	 * 
+	 * Right now it's not in use, but it can reduce the Roll and Pitch values or
+	 * put 'Z' to zero in case that all of that is just considered irrelevant.
+	 * 
+	 * Once the restrictions are applied, the new transform could be converted back
+	 * to the camera coordinate system and used as a hint for the ICP estimation.
+	 * 
+	 * Precondition: the transform is already in ROS convention coordinates
+	 * and it's obviously assumed that the fixed_camera_tf... is already applied
+	 * so this doesn't depend on its inclination.
+	 * 
+	 */
 	void applyRestrictions();
-	void changeCoordinates();
+
+	/**
+	   * Corrects the values from the originally obtained coordinates
+	   * following the ROS convention:
+	   * 
+	   * "3D coordinate systems in ROS are always right-handed, with X
+	   * forward, Y left, and Z up." (http://ros.org/wiki/tf/Overview/Transformations)
+	   * 
+	   * But (CAUTION!) Point Clouds have ALWAYS Y to represent up and Z for depth,
+	   * which is Forward! So the change is:
+	   * (X, Y, Z)_cloud == (Z_cloud, X_cloud,Y_cloud)_transform
+	   * 
+	   * 
+	   * 
+	   * Previously called:  void changeCoordinates();
+	   */
+	void toROSCoordinates();
 
 		
 	/**
 	   * Rounds small values of a transform frame to prevent noise from
 	   * being interpreted as movement.
 	   *   
-	   *   @param tf_result - the tf to be rounded
-	   *   @param margin - the value for the interval to be considered
+	   *   @param accuracy - the minimum difference between '0' and each value for it to be considered real (not noise)
+	   *   @param rotationAccuracy - the minimum difference between '0' and a rotation for it to be considered not noise
 	   *   "too near to zero": -margin < tooSmall < margin
 	   */
 	void round_near_zero_values(double accuracy, double rotationAccuracy);
@@ -173,8 +206,15 @@ public:
 	   *   
 	   *   @param tf_result - the transform to be rotated
 	   *   @param fixedTF - the fixed transform with the rotation to be applied
+		* 
+		* Precondition: the transform is already in ROS convention coordinates
+		* as the fixed_camera_tf... (fixedTF here) is using them as well.
 	   */
 	void get_robot_relative_tf(myTransf &fixedTF);
+
+	// Just temporal methods for tests
+	void back_to_cloud_matrix(myTransf &fixedTF, Eigen::Matrix4f &tf_matrix_result);
+	void toCloudCoordinates();
 
 	/**
 	   * Rotates a transform frame according to the passed values.
