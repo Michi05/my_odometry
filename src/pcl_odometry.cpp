@@ -67,6 +67,10 @@ const char   odometryComm::PARAM_KEY_IGNORE_TIME[] =    "odometry_ignore_time";
 const char   odometryComm::PARAM_KEY_ACCURACY[] =    "odometry_measure_accuracy";
 const char   odometryComm::PARAM_KEY_ROTATION_ACCURACY[] =    "odometry_rotation_accuracy";
 
+const char   odometryComm::PARAM_KEY_KINECT_X[] =    "kinect_x";
+const char   odometryComm::PARAM_KEY_KINECT_Y[] =    "kinect_y";
+const char   odometryComm::PARAM_KEY_KINECT_Z[] =    "kinect_z";
+
 const char   odometryComm::PARAM_KEY_KINECT_ROLL[] =    "kinect_roll";
 const char   odometryComm::PARAM_KEY_KINECT_PITCH[] =    "kinect_pitch";
 const char   odometryComm::PARAM_KEY_KINECT_YAW[] =    "kinect_yaw";
@@ -110,6 +114,10 @@ const bool   odometryComm::PARAM_DEFAULT_MANUAL_MODE = true;
 const bool   odometryComm::PARAM_DEFAULT_IGNORE_TIME = true;
 const double   odometryComm::PARAM_DEFAULT_ACCURACY = 0.01;
 const double   odometryComm::PARAM_DEFAULT_ROTATION_ACCURACY = 0.0001;
+
+const double   odometryComm::PARAM_DEFAULT_KINECT_X = 0.0f;
+const double   odometryComm::PARAM_DEFAULT_KINECT_Y = 0.0f;
+const double   odometryComm::PARAM_DEFAULT_KINECT_Z = 0.0f;
 
 const double   odometryComm::PARAM_DEFAULT_KINECT_ROLL = 0.0f;
 const double   odometryComm::PARAM_DEFAULT_KINECT_PITCH = 0.0f;
@@ -221,6 +229,10 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.param(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy, PARAM_DEFAULT_ROTATION_ACCURACY);
 
 
+		    nodeHandlePrivate.param(PARAM_KEY_KINECT_X, kinectX, PARAM_DEFAULT_KINECT_X);
+		    nodeHandlePrivate.param(PARAM_KEY_KINECT_Y, kinectY, PARAM_DEFAULT_KINECT_Y);
+		    nodeHandlePrivate.param(PARAM_KEY_KINECT_Z, kinectZ, PARAM_DEFAULT_KINECT_Z);
+
 		    nodeHandlePrivate.param(PARAM_KEY_KINECT_ROLL, kinectRoll, PARAM_DEFAULT_KINECT_ROLL);
 		    nodeHandlePrivate.param(PARAM_KEY_KINECT_PITCH, kinectPitch, PARAM_DEFAULT_KINECT_PITCH);
 		    nodeHandlePrivate.param(PARAM_KEY_KINECT_YAW, kinectYaw, PARAM_DEFAULT_KINECT_YAW);
@@ -267,6 +279,11 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		    nodeHandlePrivate.setParam(PARAM_KEY_IGNORE_TIME, ignoreTimestamp);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ACCURACY, measureAccuracy);
 		    nodeHandlePrivate.setParam(PARAM_KEY_ROTATION_ACCURACY, rotationAccuracy);
+
+		    
+		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_X, kinectX);
+		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_Y, kinectY);
+		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_Z, kinectZ);
 
 		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_ROLL, kinectRoll);
 		    nodeHandlePrivate.setParam(PARAM_KEY_KINECT_PITCH, kinectPitch);
@@ -651,13 +668,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 	void odometryComm::applyRestrictions(tf::Transform &tf_input) {
 		/* TODO: 
-		 * Dirty trick that should be ignored
-		 * errors from the algorithm in yaw calculations:
+	 * This method can help to clean errors from the algorithm in yaw calculations:
+	 * It may be improved for removing wrong measures (like height) or removed
+	 * but right now it's not doing anything, just the place to do it.
 		*/
 		double R, P, Y;			tf_input.getBasis().getRPY(R, P, Y);
-//		tf::Transform tf;		generate_tf(tf, R/10.0, P, Y/10.0);
+		tf::Vector3 origin = tf_input.getOrigin(); // tf::Vector3(0, 0, 0);
 		tf::Transform tf;		generate_tf(tf, R, P, Y);
-		tf.setOrigin(tf_input.getOrigin());
+		tf.setOrigin(tf::Vector3(origin.x(), origin.y(), origin.z()));
 		tf_input = tf;
 	}
 
@@ -919,8 +937,6 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		tf2_msg_output.transform.rotation.x = tMatrix.getRotation().getX();
 		tf2_msg_output.transform.rotation.y = tMatrix.getRotation().getY();
 		tf2_msg_output.transform.rotation.z = tMatrix.getRotation().getZ();
-	//	odom_msg_output.pose.pose.orientation.w = tMatrix.getRotation().getW();;
-		// TODO: check this again; I don't trust it
 
 		tfMessage newTFMessage;
 		newTFMessage.transforms.push_back(tf2_msg_output);
@@ -967,19 +983,19 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			else
 				ROS_ERROR("The algorithm is supposed to be run with positive values for the MAIN parameters but one or several aren't: maxIterations = %d, epsilon = %f, maxDistance = %f", maxIterations, epsilon, maxDistance);
 			std::cout << std::endl << std::endl;
-				if (euclideanDistance > 0)
-					icp.setEuclideanFitnessEpsilon (euclideanDistance);
-				else
-					printf("euclideanDistance is: %E\r\n", icp.getEuclideanFitnessEpsilon());
-				if (maxRansacIterations != 0)
-					icp.setRANSACIterations (maxRansacIterations);
-				else
-					printf("maxRansacIterations is: %E\r\n", icp.getRANSACIterations());
-				if (ransacInlierThreshold > 0)
-					icp.setRANSACOutlierRejectionThreshold (ransacInlierThreshold);
-				else
-					printf("ransacInlierThreshold is: %E\r\n", icp.getRANSACOutlierRejectionThreshold());
-				std::cout << std::endl << std::endl;
+			if (euclideanDistance > 0)
+				icp.setEuclideanFitnessEpsilon (euclideanDistance);
+			else
+				printf("euclideanDistance is: %E\r\n", icp.getEuclideanFitnessEpsilon());
+			if (maxRansacIterations != 0)
+				icp.setRANSACIterations (maxRansacIterations);
+			else
+				printf("maxRansacIterations is: %E\r\n", icp.getRANSACIterations());
+			if (ransacInlierThreshold > 0)
+				icp.setRANSACOutlierRejectionThreshold (ransacInlierThreshold);
+			else
+				printf("ransacInlierThreshold is: %E\r\n", icp.getRANSACOutlierRejectionThreshold());
+			std::cout << std::endl << std::endl;
 			
 			
 // **********************************************************			
@@ -1032,16 +1048,29 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 			
 			
 			
-			
+			newTransf.generate_tf(0, P*1.2, 0); // Real Yaw is cloud's Pitch
+			newTransf.setOrigin(tf::Vector3(0, 0, 0));
+			pcl_ros::transformAsMatrix(newTransf, hint);
+
 			
 			// Guessing with HINT
 			if (hint == Eigen::Matrix4f::Identity()) {
 				std::cout << "No hint received, creating one." << std::endl;
+				// Getting the Transform version of the matrix for the calculations
 				tf::Transform newTransf = eigenToTransform(final_result);
-				// TODO: el hint también debería poner a 0 "R y Y" (P en el convenio real)
-//				btVector3 origin(newTransf.getOrigin()[0]/5.0, newTransf.getOrigin()[1]/10.0, newTransf.getOrigin()[2]/2.0);
-				btVector3 origin(0, 0, 0);
+				
+				// Storing the current original values before the modifications
+				double R, P, Y;			newTransf.getBasis().getRPY(R, P, Y); // Unused for now. This values remain
+				tf::Vector3 origin = newTransf.getOrigin(); // tf::Vector3(0, 0, 0);
+				
+				// Generate the new tf and apply rules
+				origin = tf::Vector3(0, 0, 0);
+//				btVector3 origin(0, 0, 0); // Changing origin of coordinates ((tf::Vector3(0, 0, 0)))
+
+				newTransf.generate_tf(0, P*1.2, 0); // Real Yaw is cloud's Pitch
 				newTransf.setOrigin(origin);
+				
+				// Back to the matrix version for the hint
 				pcl_ros::transformAsMatrix(newTransf, hint);
 			}
 			else std::cout << "Using passed hint." << std::endl;
@@ -1164,6 +1193,8 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 	void odometryComm::cameraTF_callback(const tf::tfMessageConstPtr& newTF) {
 		const tf::tfMessage& msg_in = *newTF;
 		tf::transformMsgToTF(msg_in.transforms[0].transform, fixed_camera_transform);
+
+		std::cout << "***new camera fixed tf:" << std::endl; fixed_camera_transform.printTransform();
 	}
 	
 	///////////////////////////////////////////////////////////
@@ -1265,12 +1296,14 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 		tf::Transform tf_result = eigenToTransform(tf_matrix_result);
 		
 		
-		// In case it is needed to make any changes in the transform
+//***********************************************************************************************
+//**************** In case it is needed to make any changes in the transform
 		filter_resulting_TF(tf_result);
-		
-		//TODO: WATCH OUT: from here on, the transform doesn't represent the relation
-		//between the clouds anymore. So in order to publish the align cloud, it should
-		//be used some kind of "back_to_camera_coordinates" method or so.	
+//***********************************************************************************************
+		//WATCH OUT: from here on, the transform doesn't represent the relation
+		//between the clouds anymore. So in order to publish the aligned clouds,
+		//the "back_to_cloud_matrix" method must be used.
+//***********************************************************************************************
 
 		
 		// In case the lineal distance is bigger than the maximum, it's unlikely

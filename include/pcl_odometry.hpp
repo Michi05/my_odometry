@@ -126,6 +126,11 @@ public:
 	  static const char PARAM_KEY_ACCURACY[];
 	  static const char PARAM_KEY_ROTATION_ACCURACY[];
 
+	  
+	  static const char PARAM_KEY_KINECT_X[];
+	  static const char PARAM_KEY_KINECT_Y[];
+	  static const char PARAM_KEY_KINECT_Z[];
+
 	  static const char PARAM_KEY_KINECT_ROLL[];
 	  static const char PARAM_KEY_KINECT_PITCH[];
 	  static const char PARAM_KEY_KINECT_YAW[];
@@ -171,6 +176,10 @@ public:
 	  static const double PARAM_DEFAULT_ROTATION_ACCURACY;
 
 
+	  static const double PARAM_DEFAULT_KINECT_X;
+	  static const double PARAM_DEFAULT_KINECT_Y;
+	  static const double PARAM_DEFAULT_KINECT_Z;
+	  
 	  static const double PARAM_DEFAULT_KINECT_ROLL;
 	  static const double PARAM_DEFAULT_KINECT_PITCH;
 	  static const double PARAM_DEFAULT_KINECT_YAW;
@@ -189,64 +198,65 @@ public:
 	//////////// PARAMETERS FOR THE FILTERS AND ALGORITHM ////////////////
 	//////////////////////////////////////////////////////////////////////
 
-	///////// ICP ALGORITHM (from the IterativeClosestPoint Detailed Description):
-		// Maximum amount of iterations of the ICP algorithm for approaching one group of points to another.
-	int maxIterations;
-	// Maximum distance between the homolog points after the transformation.
-	double maxDistance;
-	// Maximum epsilon (difference) between the previous transformation and the current estimated transformation.
-	double epsilon;
-	// The sum of Euclidean squared errors between the pairs of points.
-	double euclideanDistance;
-	// Maximum amount of iterations for each execution of the RANSAC algorithm
-	int maxRansacIterations;
-	// Maximum distance between the points considered inliers for the RANSAc estimation.
-	double ransacInlierThreshold;
-	// Minimum "algorithm output score" for an estimation to be considered valid.
-	double ICPMinScore;
+		///////// ICP ALGORITHM (from the IterativeClosestPoint Detailed Description):
+			// Maximum amount of iterations of the ICP algorithm for approaching one group of points to another.
+		int maxIterations;
+		// Maximum distance between the homolog points after the transformation.
+		double maxDistance;
+		// Maximum epsilon (difference) between the previous transformation and the current estimated transformation.
+		double epsilon;
+		// The sum of Euclidean squared errors between the pairs of points.
+		double euclideanDistance;
+		// Maximum amount of iterations for each execution of the RANSAC algorithm
+		int maxRansacIterations;
+		// Maximum distance between the points considered inliers for the RANSAc estimation.
+		double ransacInlierThreshold;
+		// Minimum "algorithm output score" for an estimation to be considered valid.
+		double ICPMinScore;
 
-	///////// x,y,z values to TRIM POINTCLOUD CLOUD
-	// Ratios (0 to 1) of the previous point cloud for
-	//ICP to use in the matching with the next cloud.
-	double cloud_trim_x, cloud_trim_y, cloud_trim_z;
+		///////// x,y,z values to TRIM POINTCLOUD CLOUD
+		// Ratios (0 to 1) of the previous point cloud for
+		//ICP to use in the matching with the next cloud.
+		double cloud_trim_x, cloud_trim_y, cloud_trim_z;
 
-	///////// RESOLUTION FILTER ("VoxelGrid" class):
-	bool doDownsampleFiltering; // To turn it on an off
-	double leafSize;
-	// The number determines the accuracy of the PCL; the smaller the number, the higher the amount of points
+		///////// RESOLUTION FILTER ("VoxelGrid" class):
+		bool doDownsampleFiltering; // To turn it on an off
+		double leafSize;
+		// The number determines the accuracy of the PCL; the smaller the number, the higher the amount of points
 
-	///////// DISTANCE FILTER ("PashThrough" class):
-	bool doDepthFiltering; // To turn it on an off
-	double minDepth, maxDepth;
-	// Depth distance boundaries for filtering points that are too far or too close.
+		///////// DISTANCE FILTER ("PashThrough" class):
+		bool doDepthFiltering; // To turn it on an off
+		double minDepth, maxDepth;
+		// Depth distance boundaries for filtering points that are too far or too close.
 
-	///////// NOISE FILTER ("RadiusOutlierRemoval"):
-	bool doNoiseFiltering; // To turn it on an off
-	int neighbours;
-	// Minimum amount of neighbour points for a point to be considered "alone" and classify it as noise.
-	double radius;
-	// Maximum radius distance in which to look for the above neighbours.
-	
-	///////// PUBLIC TOPIC NAMES:
-	std::string inputStrRequest_topic;
-	std::string inputPCL_topic;
-	std::string cameraTF_topic;
-	std::string outputGlobalOdometry_topic;
-	std::string outputRelativeOdometry_topic;
-	
-	std::string outputAlignedCloud_topic;
-	std::string outputInitialCloud_topic;
-	std::string outputFilteredCloud_topic;
-	std::string outputOdometryAnswer_topic;
-	
-	///////// PCL_Odometry Configuration:
-	bool manualMode, ignoreTimestamp;
-	double measureAccuracy, rotationAccuracy;
+		///////// NOISE FILTER ("RadiusOutlierRemoval"):
+		bool doNoiseFiltering; // To turn it on an off
+		int neighbours;
+		// Minimum amount of neighbour points for a point to be considered "alone" and classify it as noise.
+		double radius;
+		// Maximum radius distance in which to look for the above neighbours.
+		
+		///////// PUBLIC TOPIC NAMES:
+		std::string inputStrRequest_topic;
+		std::string inputPCL_topic;
+		std::string cameraTF_topic;
+		std::string outputGlobalOdometry_topic;
+		std::string outputRelativeOdometry_topic;
+		
+		std::string outputAlignedCloud_topic;
+		std::string outputInitialCloud_topic;
+		std::string outputFilteredCloud_topic;
+		std::string outputOdometryAnswer_topic;
+		
+		///////// PCL_Odometry Configuration:
+		bool manualMode, ignoreTimestamp;
+		double measureAccuracy, rotationAccuracy;
 
-	//////// Physical Description Configuration:
-	double kinectRoll,kinectPitch, kinectYaw;
-	
-	
+		//////// Physical Description Configuration:
+		double kinectX,kinectY, kinectZ;
+		double kinectRoll,kinectPitch, kinectYaw;
+		
+		
 	////////////////////////////////////////////////////
 	//////////// CLASS SCOPE DATA MEMBERS //////////////
 	////////////////////////////////////////////////////
@@ -688,14 +698,24 @@ private:
 	   *   @param cloud_final - second PC for the algorithm, which should be the final
 	   *   						position to which to compare with.
 	   *
-	   *   @return The transform frame representing hte relative position between the
+	   *   @return The transform frame representing the relative position between the
 	   *   two pointclouds stored in a Matrix4f.
 	   */
 	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, double *final_score_out=0);
 	Eigen::Matrix4f process2CloudsICP(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final, Eigen::Matrix4f &hint, double *final_score_out=0);
 	
 
-	// TODO: Document if it finally works
+	  /**
+	   * Alternative to "process2CloudsICP" using SVD based algorithm
+	   *   
+	   *   @param cloud_initial - first PC for the algorithm. This one is suppossed to be the
+	   *   					initial one in chronological order.
+	   *   @param cloud_final - second PC for the algorithm, which should be the final
+	   *   						position to which to compare with.
+	   *
+	   *   @return The transform frame representing the relative position between the
+	   *   two pointclouds stored in a Matrix4f.
+	   */
 	Eigen::Matrix4f estimateTransformation(PointCloudT::Ptr &cloud_initial, PointCloudT::Ptr &cloud_final);
 
 	

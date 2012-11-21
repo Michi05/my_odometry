@@ -83,6 +83,8 @@ static bool printUsage(std::string nodeName, int argc, char** argv) {
 			  pcl_odometry::odometryComm::PARAM_KEY_ICP_RANSAC_THRESHOLD,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_ICP_RANSAC_THRESHOLD);
 	  
+	  printf("\n");
+	  
 	  printf("    _%s:=%f\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_RESOLUTION_LEAF_SIZE,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_RESOLUTION_LEAF_SIZE);
@@ -110,6 +112,8 @@ static bool printUsage(std::string nodeName, int argc, char** argv) {
 			  pcl_odometry::odometryComm::PARAM_KEY_NOISE_FILTERING,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_NOISE_FILTERING);
 	  
+	  printf("\n");
+	  
 	  printf("    _%s:=%s\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_TOPIC_INPUT_STR,
 			 (nodeName + "/" + pcl_odometry::odometryComm::PARAM_DEFAULT_TOPIC_INPUT_STR).c_str());
@@ -135,14 +139,36 @@ static bool printUsage(std::string nodeName, int argc, char** argv) {
 	  printf("    _%s:=%s\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_TOPIC_ODOMETRY_ANSWER,
 			 (nodeName + "/" + pcl_odometry::odometryComm::PARAM_DEFAULT_TOPIC_ODOMETRY_ANSWER).c_str());
-
+	  
+	  printf("\n");
+	  
 	  printf("    _%s:=%d\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_MANUAL_MODE,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_MANUAL_MODE);
-	  printf("    _%s:=%d\n",
+	  printf("    _%s:=%f\n",
 			  pcl_odometry::odometryComm::PARAM_KEY_ACCURACY,
 			  pcl_odometry::odometryComm::PARAM_DEFAULT_ACCURACY);
+	  
       printf("\n");
+
+	  printf("    _%s:=%d\n",
+			  pcl_odometry::odometryComm::PARAM_KEY_KINECT_X,
+			  pcl_odometry::odometryComm::PARAM_DEFAULT_KINECT_X);
+	  printf("    _%s:=%d\n",
+			  pcl_odometry::odometryComm::PARAM_KEY_KINECT_Y,
+			  pcl_odometry::odometryComm::PARAM_DEFAULT_KINECT_Y);
+	  printf("    _%s:=%d\n",
+			  pcl_odometry::odometryComm::PARAM_KEY_KINECT_Z,
+			  pcl_odometry::odometryComm::PARAM_DEFAULT_KINECT_Z);
+	  printf("    _%s:=%d\n",
+			  pcl_odometry::odometryComm::PARAM_KEY_KINECT_ROLL,
+			  pcl_odometry::odometryComm::PARAM_DEFAULT_KINECT_ROLL);
+	  printf("    _%s:=%d\n",
+			  pcl_odometry::odometryComm::PARAM_KEY_KINECT_PITCH,
+			  pcl_odometry::odometryComm::PARAM_DEFAULT_KINECT_PITCH);
+	  printf("    _%s:=%d\n",
+			  pcl_odometry::odometryComm::PARAM_KEY_KINECT_YAW,
+			  pcl_odometry::odometryComm::PARAM_DEFAULT_KINECT_YAW);
       return true;
     }
   }
